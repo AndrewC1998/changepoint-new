@@ -16,6 +16,7 @@ Depends: R(>= 3.1), methods, stats, zoo(>= 0.9-1)
 Suggests: testthat
 License: GPL
 LazyLoad: yes
+LazyData: true
 Packaged: 2016-10-04 14:31:26 UTC; killick
 NeedsCompilation: yes
 Author: Rebecca Killick [aut, cre],
