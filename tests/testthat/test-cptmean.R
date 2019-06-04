@@ -210,7 +210,7 @@ checkOtherPenalties <- function(methodLog){
 for(d in 1:length(data)){
   if(is.element(NA, data[[d]])){
     test_that(paste0("Test #",t," :data=",d), {      
-      expect_that(cpt.mean(data=data[[d]]),throws_error("Missing value: NA is not allowed in the data as changepoint methods are only sensible for regularly spaced data."))
+      expect_that(cpt.mean(data=data[[d]]),throws_error("Missing value: NA is not allowed in the data as changepoint methods assume regularly spaced data."))
       t = t + 1
     })
     
