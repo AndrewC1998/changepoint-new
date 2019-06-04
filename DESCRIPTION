@@ -13,7 +13,7 @@ BugReports: <changepoints@lancs.ac.uk>
 URL: https://github.com/rkillick/changepoint/
 Description: Implements various mainstream and specialised changepoint methods for finding single and multiple changepoints within data.  Many popular non-parametric and frequentist methods are included.  The cpt.mean(), cpt.var(), cpt.meanvar() functions should be your first point of call.
 Depends: R(>= 3.1), methods, stats, zoo(>= 0.9-1)
-Suggests: testthat
+Suggests: testthat, vdiffr
 License: GPL
 LazyLoad: yes
 LazyData: true
