@@ -207,7 +207,7 @@ for(d in 1:length(data)){
   if(is.element(NA, data[[d]])){
     test_that(paste0("Test #",t," :data=",d,"penalty=",penalties[p],", method=",methods[m],",class=",cl,", param=",pe,", test.stat=",testStats[ts]), {
       
-      expect_that(cpt.meanvar(data=data[[d]]),throws_error('Missing value: NA is not allowed in the data as changepoint methods assume regularly spaced data.'))
+      expect_that(cpt.meanvar(data=data[[d]]),throws_error('Missing value: NA is not allowed in the data as changepoint methods are only sensible for regularly spaced data.'))
       #not user friendly error : Error in if (teststat >= pen.value) { : 
       #       missing value where TRUE/FALSE needed
       #       In addition: Warning message:
