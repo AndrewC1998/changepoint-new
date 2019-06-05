@@ -7,7 +7,9 @@ Identifying Changes in Regression
 Calculates the optimal positioning and (potentially) number of changepoints for data using the user specified method.
 }
 \usage{
-cpt.reg(data, penalty="MBIC", pen.value=0, method="PELT", dist="Normal", class=TRUE, param.estimates=TRUE, minseglen=length(data[1,]), shape = 0, tol = 1e-07)
+cpt.reg(data, penalty="MBIC", pen.value=0, method="PELT",
+dist="Normal", class=TRUE, param.estimates=TRUE, 
+minseglen=length(data[1,]), shape = 0, tol = 1e-07)
 }
 \arguments{
   \item{data}{
@@ -82,28 +84,36 @@ n=length(data)
 #for AR(1)
 
 AR1 <- cbind(data[-1],rep(1,n-1),data[1:(n-1)])
-cpt.reg(AR1, penalty="MBIC", pen.value=0, method="PELT", dist="Normal", class=TRUE, param.estimates=TRUE, minseglen=length(AR1[1,]), shape = 0, tol = 1e-07)
+cpt.reg(AR1, penalty="MBIC", pen.value=0, method="PELT",
+dist="Normal", class=TRUE, param.estimates=TRUE, 
+minseglen=length(AR1[1,]), shape = 0, tol = 1e-07)
 
 #
 
 #For AR(2)
 
 AR2 <- cbind(data[-c(1:2)],rep(1,n-2),data[2:(n-1)],data[1:(n-2)])
-cpt.reg(AR2, penalty="MBIC", pen.value=0, method="PELT", dist="Normal", class=TRUE, param.estimates=TRUE, minseglen=length(AR2[1,]), shape = 0, tol = 1e-07)
+cpt.reg(AR2, penalty="MBIC", pen.value=0, method="PELT",
+dist="Normal", class=TRUE, param.estimates=TRUE,
+minseglen=length(AR2[1,]), shape = 0, tol = 1e-07)
 
 #
 
 #For AR(3)
 
 AR3 <- cbind(data[-c(1:3)],rep(1,n-3),data[3:(n-1)],data[2:(n-2)],data[1:(n-3)])
-cpt.reg(AR3, penalty="MBIC", pen.value=0, method="PELT", dist="Normal", class=TRUE, param.estimates=TRUE, minseglen=length(AR3[1,]), shape = 0, tol = 1e-07)
+cpt.reg(AR3, penalty="MBIC", pen.value=0, method="PELT", 
+dist="Normal", class=TRUE, param.estimates=TRUE,
+minseglen=length(AR3[1,]), shape = 0, tol = 1e-07)
 
 #
 
 #For AR(4)
 
 AR4 <- cbind(data[-c(1:4)],rep(1,n-4),data[4:(n-1)],data[3:(n-2)],data[2:(n-3)],data[1:(n-4)])
-cpt.reg(AR4, penalty="MBIC", pen.value=0, method="PELT", dist="Normal", class=TRUE, param.estimates=TRUE, minseglen=length(AR4[1,]), shape = 0, tol = 1e-07)
+cpt.reg(AR4, penalty="MBIC", pen.value=0, method="PELT",
+dist="Normal", class=TRUE, param.estimates=TRUE,
+minseglen=length(AR4[1,]), shape = 0, tol = 1e-07)
 }
 
 \keyword{methods}
