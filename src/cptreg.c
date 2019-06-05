@@ -438,7 +438,7 @@ void CptReg_Normal_AMOC(double *data, int *n, int *m, double *pen,
         neval++;
     }
     //Which tstar returns the minimum cost
-    min_which(tmplike + *minseglen - 1, &neval, taulike, tau);
+    minwhich(tmplike + *minseglen - 1, &neval, taulike, tau);
     *tau += *minseglen;
     
     //Free allocated memory
