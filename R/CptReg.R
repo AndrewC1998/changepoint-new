@@ -1,5 +1,8 @@
 cpt.reg <- function(data, penalty="MBIC", pen.value=0, method="PELT", dist="Normal",
-  class=TRUE, param.estimates=TRUE, minseglen=length(data[1,]), shape = 0, tol = 1e-07){
+  class=TRUE, param.estimates=TRUE, minseglen=0, shape = 0, tol = 1e-07){
+      if(minseglen==0){
+          minseglen = length(data[1,])
+      }
   MBIC=0
   ##Check arguments are valid
   if(!is.array(data) || !is.numeric(data))  ##Further checks applied later
