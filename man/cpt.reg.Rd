@@ -20,7 +20,7 @@ cpt.reg(data, penalty="MBIC", pen.value=0, method="PELT",
 
 dist="Normal", class=TRUE, param.estimates=TRUE, 
 
-minseglen=length(data[1,]), shape = 0, tol = 1e-07)
+minseglen=0, shape = 0, tol = 1e-07)
 
 }
 
