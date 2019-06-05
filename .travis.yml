@@ -1,9 +1,7 @@
-warnings_are_errors: false
-
 language: r
 sudo: required
 cache: packages
-warnings_are_errors: true
+warnings_are_errors: false
 r_check_revdep: false
 r:
   - 3.2
