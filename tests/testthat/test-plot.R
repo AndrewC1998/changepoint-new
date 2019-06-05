@@ -16,3 +16,6 @@ plot(obj.cpt.range, diagnostic = TRUE, type = "h")
 
 #vdiffr::expect_doppelganger("Diagnostic plot (default)", plot(obj.cpt.range, diagnostic = TRUE))
 #vdiffr::expect_doppelganger("Diagnostic plot (histogram)", plot(obj.cpt.range, diagnostic = TRUE, type = "h"))
+
+
+
