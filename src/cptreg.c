@@ -219,18 +219,18 @@ void RegQuadCostFunc(double *SS, int *m, int *n, int *p, int *start, int *end,
 }
 
 //Find the minimum case
-void minwhich(double *data, int *n, double *minval, int *minid){
-  //data - values for which to find the minimum
+void minwhich(double *sumstat, int *n, double *minval, int *minid){
+  //sumstat - values for which to find the minimum
   //n - number of items to search
   //minval - minimum value
   //minid - index from start where to find minimum
   int i;
   *minid = 0;
-  *minval = data[*minid];
+  *minval = sumstat[*minid];
   for(i = 1; i < *n; i++){
-    if(data[i] < *minval){
+    if(sumstat[i] < *minval){
       *minid = i;
-      *minval = data[i];
+      *minval = sumstat[i];
     }
   }
   return;
@@ -238,11 +238,11 @@ void minwhich(double *data, int *n, double *minval, int *minid){
 
 
 //Determine cpts for Normal regression under method PELT
-void CptReg_Normal_PELT(double *data, int *n, int *m, double *pen, int *cptsout,
+void CptReg_Normal_PELT(double *sumstat, int *n, int *m, double *pen, int *cptsout,
   int *error, double *shape, int *minseglen, double *tol, double *lastchangelike,
   int *lastchangecpts, int *numchangecpts, int *MBIC){
 
-  //data           - vectorised matrix of size n x m
+  //sumstat        - vectorised matrix of size n x m
   //n              - number of records
   //m              - number of data points per record
   //pen            - penalty value
@@ -285,7 +285,7 @@ void CptReg_Normal_PELT(double *data, int *n, int *m, double *pen, int *cptsout,
   }
   
   //Evaluate the summary statistics
-  RegQuadCost_SS(data, n, m, Sumstats, &size);
+  RegQuadCost_SS(sumstat, n, m, Sumstats, &size);
 
   //Initialise
   for(j = 0; j <= *minseglen; j++){
@@ -378,11 +378,11 @@ void Free_CptReg_Normal_PELT(int *error){
 }
 
 //Determine cpts for Normal regression under method AMOC
-void CptReg_Normal_AMOC(double *data, int *n, int *m, double *pen,
+void CptReg_Normal_AMOC(double *sumstat, int *n, int *m, double *pen,
                         int *error, double *shape, int *minseglen, double *tol, int *tau,
                         double *nulllike, double *taulike, double *tmplike, int *MBIC){
     
-    //data           - vectorised matrix of size n x m
+    //sumstat        - vectorised matrix of size n x m
     //n              - number of records
     //m              - number of data points per record
     //pen            - penalty value
@@ -404,14 +404,14 @@ void CptReg_Normal_AMOC(double *data, int *n, int *m, double *pen,
     int neval;
     *error = 0;
     
-    //Summary statistcs
+    //Summary statistics
     double *Sumstats = (double *)calloc(np1 * size, sizeof(double));
     if(Sumstats == NULL){
         *error = 1;
         goto err1;
     }
     //Evaluate the summary statistics
-    RegQuadCost_SS(data, n, m, Sumstats, &size);
+    RegQuadCost_SS(sumstat, n, m, Sumstats, &size);
     
     //cost with no changepoints
     zero = 0;

@@ -147,7 +147,7 @@ CptReg_AMOC_Normal <- function(data, penalty="MBIC", penalty.value=0, minseglen=
   answer[[5]]=1
   on.exit(.C("Free_CptReg_Normal_AMOC",answer[[6]],PACKAGE="changepoint"))
 
-  answer <- .C("CptReg_Normal_AMOC", data=as.double(data), n=as.integer(n),
+  answer <- .C("CptReg_Normal_AMOC", sumstat=as.double(data), n=as.integer(n),
     m=as.integer(p+1), pen=as.double(penalty.value), err=0L,
     shape=as.double(shape), minseglen=as.integer(minseglen), tol=as.double(tol),
     tau=0L, nulllike=vector("double",1), taulike=vector("double",1), 
@@ -178,7 +178,7 @@ CptReg_PELT_Normal <- function(data, penalty.value=0, minseglen=3, shape=0,
   answer[[6]]=1
   on.exit(.C("Free_CptReg_Normal_PELT",answer[[6]],PACKAGE="changepoint"))
 
-  answer <- .C("CptReg_Normal_PELT", data=as.double(data), n=n,
+  answer <- .C("CptReg_Normal_PELT", sumstat=as.double(data), n=n,
     m=as.integer(p+1), pen=as.double(penalty.value), cpt=vector("integer",n),
     err=0L, shape=as.double(shape), minseglen=as.integer(minseglen), 
     tol=as.double(tol), lastchangelike=vector("double",n+1), 
