@@ -16,189 +16,101 @@
 
 // Cost functions
 
-void mll_mean(double *SS, int *m, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-  l = *end - *start
-  if(start != 0){
-    x = SS[ *end ]  - SS[ * start ]
-    x2 = SS[*n + *end] - SS[*n + *start]
-    x3 = SS[*n + *n + *end] - SS[*n + *n + *start]
-  }else{
-    x = SS[ *end ]
-    x2 = SS[*n + *end]
-    x3 = SS[*n + *n + *end]
-  }
-  *cost = x2 - (x*x)/l ;
+// TODO: Remove the mll ones, rename the mbic to be mll and then use the MBIC switch instead.
+
+void mll_mean(double *SS, int size, int n, int p, int minorder, int optimalorder, int maxorder, int start, int end, double cost, double tol, int error, double shape, int MBIC){
+    double l = end - start;
+    double x = SS[ end ]  - SS[  start ];
+    double x2 = SS[n + end] - SS[n + start];
+    cost = x2 - (x*x)/l;
 }
 
-void mll_var(double *SS, int *m, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-  l = *end - *start
-  if(start != 0){
-    x = SS[ *end ]  - SS[ * start ]
-    x2 = SS[*n + *end] - SS[*n + *start]
-    x3 = SS[*n + *n + *end] - SS[*n + *n + *start]
-  }else{
-    x = SS[ *end ]
-    x2 = SS[*n + *end]
-    x3 = SS[*n + *n + *end]
-  }
+void mll_var(double *SS, int size, int n, int p, int minorder, int optimalorder, int maxorder, int start, int end, double cost, double tol, int error, double shape, int MBIC){
+    double l = end - start;
+    double x3 = SS[n + n + end] - SS[n + n + start];
+    if(x3<=0){
+        x3=0.00000000001;
+    }
+    cost = l*(log(2*M_PI)+log(x3/l)+1);
+}
+
+void mll_meanvar(double *SS, int size, int n, int p, int minorder, int optimalorder, int maxorder, int start, int end, double cost, double tol, int error, double shape, int MBIC){
+    double l = end - start;
+    double x = SS[ end ]  - SS[  start ];
+    double x2 = SS[n + end] - SS[n + start];
+    double sigsq=(x2-((x*x)/l))/l;
+    if(sigsq<=0){
+        sigsq=0.00000000001;
+    }
+    cost = l*(log(2*M_PI)+log(sigsq)+1); /* M_PI is in Rmath.h */
+}
+
+
+void mll_meanvar_exp(double *SS, int size, int n, int p, int minorder, int optimalorder, int maxorder, int start, int end, double cost, double tol, int error, double shape, int MBIC){
+    double l = end - start;
+    double x = SS[ end ]  - SS[  start ];
+    cost = 2*l*(log(x)-log(l));
+}
+
+void mll_meanvar_gamma(double *SS, int size, int n, int p, int minorder, int optimalorder, int maxorder, int start, int end, double cost, double tol, int error, double shape, int MBIC){
+    double l = end - start;
+    double x = SS[ end ]  - SS[  start ];
+    cost = 2*l*shape*(log(x)-log(l*shape)));
+}
+
+void mll_meanvar_poisson(double *SS, int size, int n, int p, int minorder, int optimalorder, int maxorder, int start, int end, double cost, double tol, int error, double shape, int MBIC){
+    double l = end - start;
+    double x = SS[ end ]  - SS[  start ];
+    if(x==0){
+        cost = 0;
+    }else{
+        cost = 2*x*(log(l)-log(x)));
+    }
+}
+
+void mbic_var(double *SS, int size, int n, int p, int minorder, int optimalorder, int maxorder, int start, int end, double cost, double tol, int error, double shape, int MBIC){
+  double l = end - start;
+  double x3 = SS[n + n + end] - SS[n + n + start];
   if(x3<=0){x3=0.00000000001;}
-
-  *cost = l*(log(2*M_PI)+log(x3/l)+1);
+  cost = l*(log(2*M_PI)+log(x3/l)+1)+log(l); /* M_PI is in Rmath.h  */
 }
 
-void mll_meanvar(double *SS, int *m, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-  l = *end - *start
-  if(start != 0){
-    x = SS[ *end ]  - SS[ * start ]
-    x2 = SS[*n + *end] - SS[*n + *start]
-    x3 = SS[*n + *n + *end] - SS[*n + *n + *start]
-  }else{
-    x = SS[ *end ]
-    x2 = SS[*n + *end]
-    x3 = SS[*n + *n + *end]
-  }
+void mbic_meanvar(double *SS, int size, int n, int p, int minorder, int optimalorder, int maxorder, int start, int end, double cost, double tol, int error, double shape, int MBIC){
+  double l = end - start;
+  double x = SS[ end ]  - SS[  start ];
+  double x2 = SS[n + end] - SS[n + start];
   double sigsq=(x2-((x*x)/l))/l;
   if(sigsq<=0){sigsq=0.00000000001;}
-
-  *cost = l*(log(2*M_PI)+log(sigsq)+1); /* M_PI is in Rmath.h  */
+  cost = l*(log(2*M_PI)+log(sigsq)+1)+log(l); /* M_PI is in Rmath.h  */
 }
 
 
-void mll_meanvar_exp(double *SS, int *m, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-  l = *end - *start
-  if(start != 0){
-    x = SS[ *end ]  - SS[ * start ]
-    x2 = SS[*n + *end] - SS[*n + *start]
-    x3 = SS[*n + *n + *end] - SS[*n + *n + *start]
-  }else{
-    x = SS[ *end ]
-    x2 = SS[*n + *end]
-    x3 = SS[*n + *n + *end]
-  }
-  *cost = 2*l*(log(x)-log(l));
+void mbic_mean(double *SS, int size, int n, int p, int minorder, int optimalorder, int maxorder, int start, int end, double cost, double tol, int error, double shape, int MBIC){
+  double l = end - start;
+  double x = SS[ end ]  - SS[  start ];
+  double x2 = SS[n + end] - SS[n + start];
+  cost = x2-(x*x)/l+log(l);
 }
 
-void mll_meanvar_gamma(double *SS, int *m, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-  l = *end - *start
-  if(start != 0){
-    x = SS[ *end ]  - SS[ * start ]
-    x2 = SS[*n + *end] - SS[*n + *start]
-    x3 = SS[*n + *n + *end] - SS[*n + *n + *start]
-  }else{
-    x = SS[ *end ]
-    x2 = SS[*n + *end]
-    x3 = SS[*n + *n + *end]
-  }
-  *cost = 2*l*shape*(log(x)-log(l*shape)));
+void mbic_meanvar_exp(double *SS, int size, int n, int p, int minorder, int optimalorder, int maxorder, int start, int end, double cost, double tol, int error, double shape, int MBIC){
+  double l = end - start;
+  double x = SS[ end ]  - SS[  start ];
+  cost = 2*l*(log(x)-log(l))+log(l);
 }
 
-double mll_meanvar_poisson(double *SS, int *m, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-  l = *end - *start
-  if(start != 0){
-    x = SS[ *end ]  - SS[ * start ]
-    x2 = SS[*n + *end] - SS[*n + *start]
-    x3 = SS[*n + *n + *end] - SS[*n + *n + *start]
-  }else{
-    x = SS[ *end ]
-    x2 = SS[*n + *end]
-    x3 = SS[*n + *n + *end]
-  }
+void mbic_meanvar_gamma(double *SS, int size, int n, int p, int minorder, int optimalorder, int maxorder, int start, int end, double cost, double tol, int error, double shape, int MBIC){
+  double l = end - start;
+  double x = SS[ end ]  - SS[  start ];
+  cost = 2*l*shape*(log(x)-log(l*shape))+log(l);
+}
+
+void mbic_meanvar_poisson(double *SS, int size, int n, int p, int minorder, int optimalorder, int maxorder, int start, int end, double cost, double tol, int error, double shape, int MBIC){
+  double l = end - start;
+  double x = SS[ end ]  - SS[ start ];
   if(x==0){
-    *cost = 0;
+    cost = 0;
   }else{
-    *cost = 2*x*(log(l)-log(x)));
-  }
-}
-
-double mbic_var(double *SS, int *m, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-  l = *end - *start
-  if(start != 0){
-    x = SS[ *end ]  - SS[ * start ]
-    x2 = SS[*n + *end] - SS[*n + *start]
-    x3 = SS[*n + *n + *end] - SS[*n + *n + *start]
-  }else{
-    x = SS[ *end ]
-    x2 = SS[*n + *end]
-    x3 = SS[*n + *n + *end]
-  }
-  if(x3<=0){x3=0.00000000001;}
-  *cost = l*(log(2*M_PI)+log(x3/l)+1)+log(l)); /* M_PI is in Rmath.h  */
-}
-
-void mbic_meanvar(double *SS, int *m, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-  l = *end - *start
-  if(start != 0){
-    x = SS[ *end ]  - SS[ * start ]
-    x2 = SS[*n + *end] - SS[*n + *start]
-    x3 = SS[*n + *n + *end] - SS[*n + *n + *start]
-  }else{
-    x = SS[ *end ]
-    x2 = SS[*n + *end]
-    x3 = SS[*n + *n + *end]
-  }
-  double sigsq=(x2-((x*x)/l))/l;
-  if(sigsq<=0){sigsq=0.00000000001;}
-  *cost = l*(log(2*M_PI)+log(sigsq)+1)+log(l)); /* M_PI is in Rmath.h  */
-}
-
-
-void mbic_mean(double *SS, int *m, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-  l = *end - *start
-  if(start != 0){
-    x = SS[ *end ]  - SS[ * start ]
-    x2 = SS[*n + *end] - SS[*n + *start]
-    x3 = SS[*n + *n + *end] - SS[*n + *n + *start]
-  }else{
-    x = SS[ *end ]
-    x2 = SS[*n + *end]
-    x3 = SS[*n + *n + *end]
-  }
-  *cost = x2-(x*x)/l+log(l);
-}
-
-void mbic_meanvar_exp(double *SS, int *m, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-  l = *end - *start
-  if(start != 0){
-    x = SS[ *end ]  - SS[ * start ]
-    x2 = SS[*n + *end] - SS[*n + *start]
-    x3 = SS[*n + *n + *end] - SS[*n + *n + *start]
-  }else{
-    x = SS[ *end ]
-    x2 = SS[*n + *end]
-    x3 = SS[*n + *n + *end]
-  }
-  *cost = 2*l*(log(x)-log(l))+log(l);
-}
-
-void mbic_meanvar_gamma(double *SS, int *m, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-  l = *end - *start
-  if(start != 0){
-    x = SS[ *end ]  - SS[ * start ]
-    x2 = SS[*n + *end] - SS[*n + *start]
-    x3 = SS[*n + *n + *end] - SS[*n + *n + *start]
-  }else{
-    x = SS[ *end ]
-    x2 = SS[*n + *end]
-    x3 = SS[*n + *n + *end]
-  }
-  *cost = 2*l*shape*(log(x)-log(l*shape))+log(l);
-}
-
-void mbic_meanvar_poisson(double *SS, int *m, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-  l = *end - *start
-  if(start != 0){
-    x = SS[ *end ]  - SS[ * start ]
-    x2 = SS[*n + *end] - SS[*n + *start]
-    x3 = SS[*n + *n + *end] - SS[*n + *n + *start]
-  }else{
-    x = SS[ *end ]
-    x2 = SS[*n + *end]
-    x3 = SS[*n + *n + *end]
-  }
-  if(x==0){
-    *cost = 0;
-  }else{
-    *cost = 2*x*(log(l)-log(x))+log(l));
+    cost = 2*x*(log(l)-log(x))+log(l);
   }
 }
 
@@ -404,36 +316,36 @@ void RegQuadCost_SS(double *X, int *n, int *nc, double *SS, int *m){
 
 
 //Find the maximum case
-void max_which(double *sumstat, int *n, double *maxval, int *maxid){
-  //sumstat - values for which to find the maximum
+void max_which(double *array, int *n, double *maxval, int *maxid){
+  //array - values for which to find the maximum
   //n - number of items to search
   //maxval - maximum value
-  //minid - index from start where to find minimum
+  //maxid - index of the maximum value in the array
   int i;
   *maxid = 0;
-  *maxval = sumstat[*maxid];
+  *maxval = array[*maxid];
   for(i = 1; i < *n; i++){
-    if(sumstat[i] > *maxval){
+    if(array[i] > *maxval){
       *maxid = i;
-      *maxval = sumstat[i];
+      *maxval = array[i];
     }
   }
   return;
 }
 
 //Find the minimum case
-void min_which(double *sumstat, int *n, double *minval, int *minid){
-  //sumstat - values for which to find the minimum
+void min_which(double *array, int *n, double *minval, int *minid){
+  //array - values for which to find the minimum
   //n - number of items to search
   //minval - minimum value
-  //minid - index from start where to find minimum
+  //minid - index of the minimum value in the array
   int i;
   *minid = 0;
-  *minval = sumstat[*minid];
+  *minval = array[*minid];
   for(i = 1; i < *n; i++){
-    if(sumstat[i] < *minval){
+    if(array[i] < *minval){
       *minid = i;
-      *minval = sumstat[i];
+      *minval = array[i];
     }
   }
   return;

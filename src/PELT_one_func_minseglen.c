@@ -31,39 +31,40 @@ void FreePELT(error)
 	  free((void *)checklist);
 	  free((void *)tmplike);
 	  free((void *)tmpt);
-    free((void *)Sumstats);
+    	  free((void *)Sumstats);
   }
 }
 
-void PELT(cost_func, sumstat, n, m, minorder, optimalorder, maxorder, pen, cptsout,
-	error, shape, minseglen, tol, lastchangelike, lastchangecpts, numchangecpts, MBIC)
+void PELT(cost_func, sumstat, n, m, pen, cptsout, error, shape, minorder, optimalorder, maxorder, minseglen, tol, lastchangelike, lastchangecpts, numchangecpts, MBIC)
   char **cost_func;
   double *sumstat;    /* Summary statistic for the time series, vectorised matrix of size n x m */
-	int *n;			/* number of records */
-	int *m;     /* number of data points per record */
-	int minorder; /* minimum order for mll_ar */
-	int optimalorder;
-	int maxorder; /* maximum order for mll_ar */
+  int *n;			/* Length of the time series */
+  int *m;     /* number of dimensions (regressors+1) */
   double *pen;  /* Penalty used to decide if a changepoint is significant */
   int *cptsout;    /* Vector of identified changepoint locations */
   int *error;   /* 0 by default, nonzero indicates error in code */
   double *shape; // only used when cost_func is the gamma likelihood
+  int *minorder; /* minimum order for mll_ar */
+  int *optimalorder; /* vector of optimal orders per segment */
+  int *maxorder; /* maximum order for mll_ar */
   int *minseglen; //minimum segment length
-	double *tol;    //tolerance only for cpt.reg
+  double *tol;    // tolerance only for cpt.reg
   double *lastchangelike; // stores likelihood up to that time using optimal changepoint locations up to that time
   int *lastchangecpts; // stores last changepoint locations
   int *numchangecpts; //stores the current number of changepoints
-	int *MBIC;          // 1 if MBIC penalty, 0 if not
+  int *MBIC;          // 1 if MBIC penalty, 0 if not
   {
 	// R code does know.mean and fills mu if necessary
 
 	  int p = *m - 1;   //number or regressors
-	  int np1 = *n + 1; //ncols of summary statistcs array
+	  int np1 = *n + 1; // length of time series +1 for convenience
 	  int size = (*m * (*m + 1)) * 0.5; //nrows of summary statistics array
-		int nchecklist, nchecktmp;     //number of items in the checklist
+	  int nchecklist, nchecktmp;     //number of items in the checklist
 	  int start;  //indicies
-	  double segcost;   //cost over specified segment
+	  double segcost=0;   //cost over specified segment
 	  *error = 0;
+	  double minval; // previously minout
+	  int tstar,i,j,minid; // minid previously whichout
 
 void (*costfunction)();
 void mll_var();
@@ -79,7 +80,8 @@ void mbic_meanvar_exp();
 void mbic_meanvar_gamma();
 void mbic_meanvar_poisson();
 void mll_reg();
-void mll_ar();
+//void mll_ar();
+
 
    if (strcmp(*cost_func,"var.norm")==0){
    costfunction = &mll_var;
@@ -120,9 +122,9 @@ void mll_ar();
 else if (strcmp(*cost_func,"regquad")==0){
  	costfunction = &mll_reg;
 }
-else if (strcmp(*cost_func,"ar.norm")==0){
+/*else if (strcmp(*cost_func,"ar.norm")==0){
 	costfunction = &mll_ar; //change to ARP() when done but leave like this for now to stop errors when running
-}
+}*/
 
   //int checklist[*n];
 	int *checklist = (int *)calloc(np1, sizeof(int));
@@ -131,7 +133,6 @@ else if (strcmp(*cost_func,"ar.norm")==0){
 		goto err1;
 	}
 
-  double minval;
 
 //double tmplike[*n];
   double *tmplike;
@@ -150,26 +151,25 @@ else if (strcmp(*cost_func,"ar.norm")==0){
     goto err3;
   }
 
-	//Summary statistcs
-	double *Sumstats = (double *)calloc(np1 * size, sizeof(double));
-	if(Sumstats == NULL){
-		*error = 4;
-		goto err4;
-	}
-
-  int tstar,i,j,minid;
-
-
   void min_which();
 
 	if (strcmp(*cost_func,"regquad")==0){
-		void RegQuadCost_SS();
-		RegQuadCost_SS(sumstat, n, m, Sumstats, &size);
-		sumstat = Sumstats;
+	  // The sumstat from R for reg is just the design matrix so we need to calculate the actual summary statistics
+	  //Summary statistics
+	  double *Sumstats;
+	  Sumstats = (double *)calloc(np1 * size, sizeof(double));
+	  if(Sumstats == NULL){
+	    *error = 4;
+	    goto err4;
+	  }
+
+	  void RegQuadCost_SS();
+	  RegQuadCost_SS(sumstat, n, m, Sumstats, &size);
+	  sumstat = Sumstats; // updates sumstat to be the actual summary statistics
 	}
 
-	//Initialise
-  for(j = 0; j <= *minseglen; j++){
+  //Initialise
+  for(j = 0; j < *minseglen; j++){
     if(j==0){
       lastchangelike[j] = -*pen;
     }else{
@@ -180,10 +180,12 @@ else if (strcmp(*cost_func,"ar.norm")==0){
   }
 
  //Evaluate cost for second minseglen
-    for(j = *minseglen+1; j <= (2 * *minseglen); j++){
+    for(j = *minseglen; j < (2 * *minseglen); j++){
 
-				start = 0;
-        costfunction(sumstat, &size, &np1, &p, &minorder, &optimalorder, &maxorder, &start, &j, lastchangelike, tol, error, shape, MBIC);
+	start = 0;
+        costfunction(&sumstat, size, np1, p, *minorder, *optimalorder, *maxorder, start, j, segcost, *tol, *error, *shape, *MBIC);
+
+	lastchangelike[j]=segcost;
 
         if(*error != 0){
             goto err4;
@@ -197,17 +199,17 @@ else if (strcmp(*cost_func,"ar.norm")==0){
   checklist[0]=0;
   checklist[1]=*minseglen;
 
-  for(tstar=2 * (*minseglen+1); tstar < np1;tstar++){
+  for(tstar=2 * (*minseglen); tstar < np1;tstar++){
     R_CheckUserInterrupt(); /* checks if user has interrupted the R session and quits if true */
 
    if ((lastchangelike[tstar]) == 0){
   		for(i=0;i<(nchecklist);i++){
-				 start = checklist[i];  //last point of last segment
-				costfunction(sumstat, &size, &np1, &p, &minorder, &optimalorder, &maxorder, &start, &tstar, &segcost, tol, error, shape, MBIC);
+				start = checklist[i];  //last point of last segment
+				costfunction(&sumstat, size, np1, p, *minorder, *optimalorder, *maxorder, start, tstar, segcost, *tol, *error, *shape, *MBIC);
 
 				if(*error != 0){
-        	goto err4;
-        }
+        				goto err5;
+        			}
 
 				tmplike[i] = lastchangelike[start] + segcost + *pen;
       }
@@ -228,9 +230,9 @@ else if (strcmp(*cost_func,"ar.norm")==0){
 			nchecklist = nchecktmp;
 			}
 			//Add new cpt to checklist
-			checklist[nchecklist] = tstar - *minseglen;
+			checklist[nchecklist] = tstar - (*minseglen-1); // atleast 1 obs per seg
 			nchecklist++;
-	}
+			
   /*  nchecklist=nchecktmp;*/
 
   } // end taustar
@@ -243,10 +245,10 @@ else if (strcmp(*cost_func,"ar.norm")==0){
         last = lastchangecpts[last];
         ncpts++;
     }
-  free(tmpt);
-  err4:  free(Sumstats);
-  err3:  free(tmplike);
-  err2:  free(checklist);
+	err5:  free(Sumstats);
+	err4:  free(tmpt);
+	err3:  free(tmplike);
+	err2:  free(checklist);
  // err3:  free(lastchangelike);
  // err2:  free(lastchangecpts);
   err1:  return;

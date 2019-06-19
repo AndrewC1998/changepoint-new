@@ -106,7 +106,7 @@ costfunction = &mbic_meanvar_poisson;
         i=1;
         start=tau[0];
         end=tau[1];
-        costfunction(sumstat, &size, &np1, &l,  &minorder, &optimalorder, &maxorder, &start, &end, cost, tol, error, *shape, MBIC);
+        costfunction(&sumstat, size, np1, l, *minorder, *optimalorder, *maxorder, start, end, cost, *tol, *error, *shape, *MBIC);
         null = (-0.5) * cost;
         
         for(j=2;j<(*n-2);j++){
@@ -114,15 +114,15 @@ costfunction = &mbic_meanvar_poisson;
             start=end;
     				i=i+1;
     				end=tau[i];
-             costfunction(sumstat, &size, &np1, &l, &minorder, &optimalorder, &maxorder, &start, &end, cost, tol, error, *shape, MBIC);
+              costfunction(&sumstat, size, np1, l, *minorder, *optimalorder, *maxorder, start, end, cost, *tol, *error, *shape, *MBIC);
              null = (-0.5) * cost;
           }
     			else{
     				if(((j-start)>=*minseglen)&&((end-j)>=*minseglen)){
                         double cost1 = 0;
                         double cost2 = 0;
-                        costfunction(sumstat, &size, &np1, &l,&minorder, &optimalorder, &maxorder, &start, &j, cost1, tol, error, *shape, MBIC);
-                        costfunction(sumstat, &size, &np1, &l, &minorder, &optimalorder, &maxorder, &j, &end, cost2, tol, error, *shape, MBIC);
+                        costfunction(&sumstat, size, np1, p, *minorder, *optimalorder, *maxorder, start, j, cost1, *tol, *error, *shape, *MBIC);
+                        costfunction(&sumstat, size, np1, p, *minorder, *optimalorder, *maxorder, start, end, cost2, *tol, *error, *shape, *MBIC);
                         lambda[j] =  ((-0.5) * cost1) + ((-0.5)* cost2) - null;
     				}
                 }
