@@ -25,29 +25,41 @@ void binseg(cost_func,sumstat,n,pen,Q,cptsout,minseglen,likeout,op_cps, shape)
      double *shape; // only used when cost_func is the gamma likelihood 
      
 {  
-     double oldmax=1.7E+308,null,lambda[*n],maxout;
-     int q,p,i,j,whichout,st,end;
+     double oldmax=1.7E+308,null,lambda[*n],maxval;
+     int q,p,i,j,maxid,end;
      for(i=0;i<*n;i++){
        lambda[i]=-INFINITY;
      }
      int tau[*Q+2]; // max ncpts is Q, +2 is for 0 and n
      tau[0]=0;
      tau[1]= *n;
+    
+    int l = 0;
+    int np1 = *n + 1; //ncols of summary statistcs array
+    int size = 0;
+    int tol = 0;
+    int start;  //indicies
+    double cost = 0;   //cost over specified segment
+    int error = 0;
+    int MBIC = 0;
+    int minorder = 0;
+    int optimalorder = 0;
+    int maxorder = 0;
 
-double mll_var(); 
-double mll_mean(); 
-double mll_meanvar(); 
-double mll_meanvar_exp(); 
-double mll_meanvar_gamma(); 
-double mll_meanvar_poisson(); 
-double mbic_var(); 
-double mbic_mean(); 
-double mbic_meanvar(); 
-double mbic_meanvar_exp(); 
-double mbic_meanvar_gamma(); 
-double mbic_meanvar_poisson(); 
+void mll_var();
+void mll_mean();
+void mll_meanvar();
+void mll_meanvar_exp();
+void mll_meanvar_gamma();
+void mll_meanvar_poisson();
+void mbic_var();
+void mbic_mean();
+void mbic_meanvar();
+void mbic_meanvar_exp();
+void mbic_meanvar_gamma();
+void mbic_meanvar_poisson();
 
-     double (*costfunction)();
+     void (*costfunction)();
      if (strcmp(*cost_func,"var.norm")==0){
    costfunction = &mll_var;
    }
@@ -92,36 +104,36 @@ costfunction = &mbic_meanvar_poisson;
       R_CheckUserInterrupt(); // checks if user has interrupted the R session and quits if true 
       for(p=0;p<*n;p++){lambda[p]=0;}
         i=1;
-        st=tau[0]+1;
-    		end=tau[1];
-        //null= (-0.5) * mll_var(*(y2+end)-*(y2+st-1),end-st+1);
-        //  null = (-0.5)* call_function(*cost_function,n,sumstat,end,st-1,end-(st-1),*shape); 
-        null = (-0.5)*costfunction(*(sumstat+end)-*(sumstat+st-1),*(sumstat + *n + 1 +end)-*(sumstat + *n + st),*(sumstat + *n + *n + 2 +end)-*(sumstat + *n + *n + 1 +st), end - st + 1, *shape);
+        start=tau[0];
+        end=tau[1];
+        costfunction(sumstat, &size, &np1, &l,  &minorder, &optimalorder, &maxorder, &start, &end, cost, tol, error, *shape, MBIC);
+        null = (-0.5) * cost;
+        
         for(j=2;j<(*n-2);j++){
           if(j==end){
-            st=end+1;
+            start=end;
     				i=i+1;
     				end=tau[i];
-            //null= (-0.5) * mll_var(*(y2+end)-*(y2+st-1),end-st+1);
-    	     // null = (-0.5)* call_function(*cost_function,n,sumstat,end,st-1,end-(st-1),*shape);
-           null = (-0.5)* costfunction(*(sumstat+end)-*(sumstat+st-1),*(sumstat + *n + 1 +end)-*(sumstat + *n + st),*(sumstat + *n + *n + 2 +end)-*(sumstat + *n + *n + 1 +st), end - st + 1, *shape);
+             costfunction(sumstat, &size, &np1, &l, &minorder, &optimalorder, &maxorder, &start, &end, cost, tol, error, *shape, MBIC);
+             null = (-0.5) * cost;
           }
     			else{
-    				if(((j-st)>=*minseglen)&&((end-j)>=*minseglen)){
-    	        // lambda[j]= ((-0.5) * mll_var(*(y2+j)-*(y2+st-1),j-st+1)) + ((-0.5) * mll_var(*(y2+end)-*(y2+j),end-j)) - null; 
-    		      //lambda[j] =  ((-0.5)*call_function(*cost_function,n,sumstat,j,st-1,j-(st-1),*shape)) + ((-0.5)*call_function(*cost_function,n,sumstat,end,j,end-j,*shape)) - null;
-              lambda[j] =  ((-0.5)*costfunction(*(sumstat+j)-*(sumstat+st-1),*(sumstat + *n + 1 +j)-*(sumstat + *n + st),*(sumstat + *n + *n + 2 +j)-*(sumstat + *n + *n + 1 +st), j - st + 1, *shape)) + 
-              ((-0.5)*costfunction(*(sumstat+end)-*(sumstat+j),*(sumstat + *n + 1 +end)-*(sumstat + *n + j + 1),*(sumstat + *n + *n + 2 +end)-*(sumstat + *n + *n + 2 +j), end - j, *shape)) - null;
+    				if(((j-start)>=*minseglen)&&((end-j)>=*minseglen)){
+                        double cost1 = 0;
+                        double cost2 = 0;
+                        costfunction(sumstat, &size, &np1, &l,&minorder, &optimalorder, &maxorder, &start, &j, cost1, tol, error, *shape, MBIC);
+                        costfunction(sumstat, &size, &np1, &l, &minorder, &optimalorder, &maxorder, &j, &end, cost2, tol, error, *shape, MBIC);
+                        lambda[j] =  ((-0.5) * cost1) + ((-0.5)* cost2) - null;
     				}
+                }
         }
-    }
 
-  max_which(lambda,*n,&maxout,&whichout);
+  max_which(lambda,*n,&maxval,&maxid);
 
-    *(cptsout+q)=whichout;
-		*(likeout+q)= (oldmax<=maxout) ? oldmax : maxout ;
+    *(cptsout+q)=maxid;
+		*(likeout+q)= (oldmax<=maxval) ? oldmax : maxval ;
     oldmax= *(likeout+q);
-		tau[q+2]=whichout;
+		tau[q+2]=maxid;
     order_vec(tau,q+3);
   }
 
@@ -202,28 +214,28 @@ double call_function(const char *name,double *sumstat, int end, int start, int n
 
 
 
-void min_which(double *array,int n,double *minout,int *whichout){
+void min_which(double *array,int n,double *minout,int *maxid){
 	// Function to find minimum of an array with n elements that is put in min 
 	*minout=*array;
-	*whichout=0;
+	*maxid=0;
 	int i;
 	for(i=1;i<n;i++){
 		if(*(array+i)< *minout){
 			*minout= *(array+i);
-			*whichout=i;
+			*maxid=i;
 		}
 	}
 }
 
-void max_which(double *array,int n,double *maxout,int *whichout){
+void max_which(double *array,int n,double *maxval,int *maxid){
 	// Function to find maximum of an array with n elements that is put in max 
-	*maxout=*array;
-	*whichout=0;
+	*maxval=*array;
+	*maxid=0;
 	int i;
 	for(i=1;i<n;i++){
-		if(*(array+i)> *maxout){
-			*maxout= *(array+i);
-			*whichout=i;
+		if(*(array+i)> *maxval){
+			*maxval= *(array+i);
+			*maxid=i;
 		}
 	}
 }

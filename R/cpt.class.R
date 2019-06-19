@@ -1,6 +1,6 @@
 setClass("cpt",slots=list(data.set="ts", cpttype="character", method="character",     test.stat="character",pen.type="character",pen.value="numeric",minseglen="numeric",cpts="numeric",ncpts.max="numeric",param.est="list",date="character",version="character"),prototype=prototype(cpttype="Not Set",date=date(),version=as(packageVersion("changepoint"),'character')))
 
-setClass("cpt.reg",slots=list(data.set="matrix", cpttype="character", method="character", test.stat="character",pen.type="character",pen.value="numeric",minseglen="numeric",cpts="numeric",ncpts.max="numeric",param.est="list",date="character",version="character"),prototype=prototype(cpttype="regression",date=date(),version=as(packageVersion("changepoint"),"character")))
+setClass("cpt.reg",slots=list(data.set="matrix", cpttype="character", method="character", test.stat="character",pen.type="character",pen.value="numeric",minseglen="numeric",cpts="numeric",ncpts.max="numeric",param.est="list",date="character",version="character", bics="numeric"),prototype=prototype(cpttype="regression",date=date(),version=as(packageVersion("changepoint"),"character")))
 
 #   setClass("cpt", representation(), prototype())
 # # cpts is the optimal segementation
@@ -385,6 +385,11 @@ setReplaceMethod("pen.value.full", "cpt.range", function(object, value) {
 setGeneric("pen.value.input<-", function(object, value) standardGeneric("pen.value.input<-"))
 setReplaceMethod("pen.value.input", "cpt", function(object, value) {
     object@pen.value.input <- value
+    return(object)
+})
+setGeneric("bics<-", function(object, value) standardGeneric("pen.value.input<-"))
+setReplaceMethod("bics", "cpt.reg", function(object, value) {
+    object@bics <- value
     return(object)
 })
 

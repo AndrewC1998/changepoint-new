@@ -7,21 +7,17 @@
 
 /* .C calls */
 extern void binseg(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
-extern void CptReg_Normal_AMOC(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
-extern void CptReg_Normal_PELT(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
+extern void CptReg_Normal_AMOC(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
 extern void Free_CptReg_Normal_AMOC(void *);
-extern void Free_CptReg_Normal_PELT(void *);
 extern void FreePELT(void *);
-extern void PELT(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
+extern void PELT(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
 
 static const R_CMethodDef CEntries[] = {
     {"binseg",                  (DL_FUNC) &binseg,                  10},
-    {"CptReg_Normal_AMOC",      (DL_FUNC) &CptReg_Normal_AMOC,      13},
-    {"CptReg_Normal_PELT",      (DL_FUNC) &CptReg_Normal_PELT,      13},
+    {"CptReg_Normal_AMOC",      (DL_FUNC) &CptReg_Normal_AMOC,      16},
     {"Free_CptReg_Normal_AMOC", (DL_FUNC) &Free_CptReg_Normal_AMOC,  1},
-    {"Free_CptReg_Normal_PELT", (DL_FUNC) &Free_CptReg_Normal_PELT,  1},
     {"FreePELT",                (DL_FUNC) &FreePELT,                 1},
-    {"PELT",                    (DL_FUNC) &PELT,                    11},
+    {"PELT",                    (DL_FUNC) &PELT,                    16},
     {NULL, NULL, 0}
 };
 

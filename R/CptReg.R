@@ -11,7 +11,7 @@ cpt.reg <- function(data, penalty="MBIC", pen.value=0, method="PELT", dist="Norm
     stop("Argument 'penelty' is invalid.")
     #value of 'penalty' & 'pen.value' checked within changepoint::penalty_decision
   if(!is.character(method) || length(method)>1)
-    stop("Argument 'method' is invalid.") 
+    stop("Argument 'method' is invalid.")
   if(method!="AMOC" && method != "PELT") ##RESTRICTION IN USE
     stop("Invalid method, must be AMOC or PELT.")
   if(!is.character(dist) || length(dist)>1)
@@ -44,7 +44,7 @@ cpt.reg <- function(data, penalty="MBIC", pen.value=0, method="PELT", dist="Norm
     #Evaluate penalty value
     pen.value <- penalty_decision(penalty=penalty,
       pen.value=pen.value, n=nrow(datai), diffparam=ncol(datai),
-      asymcheck="cpt.reg", method=method)
+      asymcheck="reg.norm", method=method)
     if(penalty=="MBIC"){MBIC=1}
 
     #Check value of minseglen
@@ -81,7 +81,7 @@ cpt.reg <- function(data, penalty="MBIC", pen.value=0, method="PELT", dist="Norm
   }
 
   ##Return result, only first case if there is only a singe data set
-  if(dim(data)[1]==1){ return(ans[[1]]) }else{ return(ans) }  
+  if(dim(data)[1]==1){ return(ans[[1]]) }else{ return(ans) }
 }
 
 ####################
@@ -93,7 +93,7 @@ check_data <- function(data, minseglen=3){
     stop("Argument 'data' must be a numerical matrix.")
   if(!is.numeric(minseglen) || length(minseglen)>1)
     stop("Argument 'minseglen' is invalid.")
-  
+
   n <- nrow(data)
   p <- ncol(data)-1
   if(p==0) stop("Dimension of data is 1, no regressors found.")
@@ -111,7 +111,7 @@ check_data <- function(data, minseglen=3){
   }
   return(data)
 }
-  
+
 
 ChangepointRegression <- function(data, penalty="MBIC", penalty.value=0,
   method="PELT", dist="Normal", minseglen=3, cpts.only=TRUE, shape=0, MBIC=0, tol=1e-07){
@@ -136,6 +136,7 @@ CptReg_AMOC_Normal <- function(data, penalty="MBIC", penalty.value=0, minseglen=
   shape=0, MBIC=0, tol=1e-07){
   n <- as.integer(nrow(data))
   p <- as.integer(ncol(data)-1)
+  cost_func <- "regquad"
   if(p<1 || n<p) stop("Invalid data dimensions.")
   #tol <- 1e-07 #Rank tolerance (see lm.fit)
   #shape <- -1 #-1=RSS,0=-2logLik,>0=-2logLik with this fixed variance
@@ -147,10 +148,10 @@ CptReg_AMOC_Normal <- function(data, penalty="MBIC", penalty.value=0, minseglen=
   answer[[5]]=1
   on.exit(.C("Free_CptReg_Normal_AMOC",answer[[6]],PACKAGE="changepoint"))
 
-  answer <- .C("CptReg_Normal_AMOC", sumstat=as.double(data), n=as.integer(n),
-    m=as.integer(p+1), pen=as.double(penalty.value), err=0L,
+  answer <- .C("CptReg_Normal_AMOC", cost_func=cost_func, sumstat=as.double(data), n=as.integer(n),
+    m=as.integer(p+1), minorder=as.integer(0), optimalorder = as.integer(0), maxorder = as.integer(0), pen=as.double(penalty.value), err=0L,
     shape=as.double(shape), minseglen=as.integer(minseglen), tol=as.double(tol),
-    tau=0L, nulllike=vector("double",1), taulike=vector("double",1), 
+    tau=0L, nulllike=vector("double",1), taulike=vector("double",1),
     tmplike=vector("double",n), MBIC=as.integer(MBIC),PACKAGE="changepoint")
 
   #Check if error has occured
@@ -158,45 +159,41 @@ CptReg_AMOC_Normal <- function(data, penalty="MBIC", penalty.value=0, minseglen=
   tmp <- c(answer$tau,answer$nulllike,answer$taulike)
   #Following line in cpt.mean (RSS) but not in old cpt.reg (-2Loglik)
   #if(penalty=="MBIC") tmp[3] = tmp[3] + log(tmp[1]) + log(n-tmp[1]+1)
-  out <- changepoint::decision(tau = tmp[1], null = tmp[2], alt = tmp[3], 
+  out <- changepoint::decision(tau = tmp[1], null = tmp[2], alt = tmp[3],
     penalty = penalty, n=n, diffparam=p, pen.value = penalty.value)
   names(out) <- c("cpts","pen.value")
   return(out)  #return list of cpts & pen.value
 }
 
-CptReg_PELT_Normal <- function(data, penalty.value=0, minseglen=3, shape=0, 
+CptReg_PELT_Normal <- function(data, penalty.value=0, minseglen=3, shape=0,
   MBIC=0, tol=1e-07){
+  #costfunc <- "regquad"
   n <- as.integer(nrow(data))
   p <- as.integer(ncol(data)-1)
+  cost_func <- "regquad"
+  err <- 0L
   #tol <- 1e-07 #Rank tolerance (see lm.fit)
   #shape <- -1 #-1=RSS,0=-2logLik,>0=-2logLik with this fixed variance
   if(!is.numeric(shape) || length(shape)!=1)
     stop("Argument 'shape' is invalid.")
-  
+
   #Check if error has occured
   answer=list()
   answer[[6]]=1
-  on.exit(.C("Free_CptReg_Normal_PELT",answer[[6]],PACKAGE="changepoint"))
+  on.exit(.C("FreePELT",answer[[6]]))
 
-  answer <- .C("CptReg_Normal_PELT", sumstat=as.double(data), n=n,
-    m=as.integer(p+1), pen=as.double(penalty.value), cpt=vector("integer",n),
-    err=0L, shape=as.double(shape), minseglen=as.integer(minseglen), 
-    tol=as.double(tol), lastchangelike=vector("double",n+1), 
-    lastchangecpts=vector("integer",n+1), numchangecpts=vector("integer",n+1), 
-    MBIC=as.integer(MBIC), PACKAGE="changepoint")
+  answer <- .C('PELT', cost_func=cost_func, sumstat=as.double(data), n=as.integer(n), m=as.integer(p+1), minorder=as.integer(0), optimalorder = as.integer(0), maxorder = as.integer(0), pen=as.double(penalty.value), cptsout=vector("integer",n), error=as.integer(err), shape=as.double(shape), minseglen=as.integer(minseglen), tol=as.double(tol), lastchangelike=vector("double",n+1), lastchangecpts=vector("integer",n+1), numchangecpts=vector("integer",n+1), MBIC=as.integer(MBIC))
+
 
   if(answer$err!=0){
     stop("C code error:",answer$err,call.=F)
   }
   return(list(lastchangecpts=answer$lastchangecpts,
-    cpts=sort(answer$cpt[answer$cpt>0]), 
-    lastchangelike=answer$lastchangelike, 
+    cpts=sort(answer$cptsout[answer$cptsout>0]),
+    lastchangelike=answer$lastchangelike,
     ncpts=answer$numchangecpts))
 }
 
 
 
 ########################################################################
-
-
-
