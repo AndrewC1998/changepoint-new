@@ -55,7 +55,7 @@ void mll_meanvar_exp(double *SS, int size, int n, int p, int minorder, int optim
 void mll_meanvar_gamma(double *SS, int size, int n, int p, int minorder, int optimalorder, int maxorder, int start, int end, double cost, double tol, int error, double shape, int MBIC){
     double l = end - start;
     double x = SS[ end ]  - SS[  start ];
-    cost = 2*l*shape*(log(x)-log(l*shape)));
+    cost = 2*l*shape*(log(x)-log(l*shape));
 }
 
 void mll_meanvar_poisson(double *SS, int size, int n, int p, int minorder, int optimalorder, int maxorder, int start, int end, double cost, double tol, int error, double shape, int MBIC){
@@ -64,7 +64,7 @@ void mll_meanvar_poisson(double *SS, int size, int n, int p, int minorder, int o
     if(x==0){
         cost = 0;
     }else{
-        cost = 2*x*(log(l)-log(x)));
+        cost = 2*x*(log(l)-log(x));
     }
 }
 
