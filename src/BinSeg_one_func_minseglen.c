@@ -1,4 +1,4 @@
-#include <R.h> 
+#include <R.h>
 #include <Rmath.h>
 #include <Rinternals.h> // RK addition
 #include <R_ext/RS.h>	// RK addition
@@ -13,18 +13,18 @@
 
 
 void binseg(cost_func,sumstat,n,pen,Q,cptsout,minseglen,likeout,op_cps, shape)
-     char **cost_func; //Descibe the cost function used i.e. norm.mean.cost (change in mean in normal distributed data)  
-     double *sumstat;  //array of summary statistics of the time series  
-     int *n;			// Length of the time series 
-     double *pen;  // Penalty used to decide if a changepoint is significant 
-     int *Q;			// Max number of changepoints 
-     int *cptsout;    // Q length vector of identified changepoint locations 
-     int *minseglen; //minimum segment length 
-     double *likeout;		// Q length vector of likelihood ratio values for changepoints in cptsout 
-     int *op_cps;		// Optimal number of changepoint for pen supplied 
-     double *shape; // only used when cost_func is the gamma likelihood 
-     
-{  
+     char **cost_func; //Descibe the cost function used i.e. norm.mean.cost (change in mean in normal distributed data)
+     double *sumstat;  //array of summary statistics of the time series
+     int *n;			// Length of the time series
+     double *pen;  // Penalty used to decide if a changepoint is significant
+     int *Q;			// Max number of changepoints
+     int *cptsout;    // Q length vector of identified changepoint locations
+     int *minseglen; //minimum segment length
+     double *likeout;		// Q length vector of likelihood ratio values for changepoints in cptsout
+     int *op_cps;		// Optimal number of changepoint for pen supplied
+     double *shape; // only used when cost_func is the gamma likelihood
+
+{
      double oldmax=1.7E+308,null,lambda[*n],maxval;
      int q,p,i,j,maxid,end;
      for(i=0;i<*n;i++){
@@ -33,7 +33,7 @@ void binseg(cost_func,sumstat,n,pen,Q,cptsout,minseglen,likeout,op_cps, shape)
      int tau[*Q+2]; // max ncpts is Q, +2 is for 0 and n
      tau[0]=0;
      tau[1]= *n;
-    
+
     int l = 0;
     int np1 = *n + 1; //ncols of summary statistcs array
     int size = 0;
@@ -46,26 +46,26 @@ void binseg(cost_func,sumstat,n,pen,Q,cptsout,minseglen,likeout,op_cps, shape)
     int optimalorder = 0;
     int maxorder = 0;
 
-void mll_var();
-void mll_mean();
-void mll_meanvar();
-void mll_meanvar_exp();
-void mll_meanvar_gamma();
-void mll_meanvar_poisson();
-void mbic_var();
-void mbic_mean();
-void mbic_meanvar();
-void mbic_meanvar_exp();
-void mbic_meanvar_gamma();
-void mbic_meanvar_poisson();
+    void (*costfunction)();
+    void mll_var();
+    void mll_mean();
+    void mll_meanvar();
+    void mll_meanvar_exp();
+    void mll_meanvar_gamma();
+    void mll_meanvar_poisson();
+    void mbic_var();
+    void mbic_mean();
+    void mbic_meanvar();
+    void mbic_meanvar_exp();
+    void mbic_meanvar_gamma();
+    void mbic_meanvar_poisson();
 
-     void (*costfunction)();
      if (strcmp(*cost_func,"var.norm")==0){
    costfunction = &mll_var;
    }
    else if (strcmp(*cost_func,"mean.norm")==0){
    costfunction = &mll_mean;
-   }  
+   }
     else if (strcmp(*cost_func,"meanvar.norm")==0){
   costfunction = &mll_meanvar;
    }
@@ -95,20 +95,20 @@ void mbic_meanvar_poisson();
 }
  else if (strcmp(*cost_func,"meanvar.poisson.mbic")==0){
 costfunction = &mbic_meanvar_poisson;
-} 
+}
 
      void max_which();
      void order_vec();
 
     for(q=0;q<*Q;q++){
-      R_CheckUserInterrupt(); // checks if user has interrupted the R session and quits if true 
+      R_CheckUserInterrupt(); // checks if user has interrupted the R session and quits if true
       for(p=0;p<*n;p++){lambda[p]=0;}
         i=1;
         start=tau[0];
         end=tau[1];
         costfunction(&sumstat, size, np1, l, minorder, optimalorder, maxorder, start, end, cost, tol, error, shape, MBIC);
         null = (-0.5) * cost;
-        
+
         for(j=2;j<(*n-2);j++){
           if(j==end){
             start=end;
@@ -146,13 +146,13 @@ costfunction = &mbic_meanvar_poisson;
 }
 
 
-// Cost functions  
+// Cost functions
 
 /*
 double mll_var(double *sumstat, int end, int start, int n, double shape){
   double x3=*(sumstat+end)-*(sumstat+start);
   if(x3<=0){x3=0.00000000001;}
-  return(n*(log(2*M_PI)+log(x3/n)+1)); // M_PI is in Rmath.h  
+  return(n*(log(2*M_PI)+log(x3/n)+1)); // M_PI is in Rmath.h
 }
 
 double mll_meanvar(double *sumstat, int end, int start, int n, double shape){
@@ -160,7 +160,7 @@ double mll_meanvar(double *sumstat, int end, int start, int n, double shape){
   double x=*(sumstat+end)-*(sumstat+start);
   double sigsq=(x2-((x*x)/n))/n;
   if(sigsq<=0){sigsq=0.00000000001;}
-  return(n*(log(2*M_PI)+log(sigsq)+1)); // M_PI is in Rmath.h  
+  return(n*(log(2*M_PI)+log(sigsq)+1)); // M_PI is in Rmath.h
 }
 
 
@@ -187,7 +187,7 @@ double mll_meanvar_poisson(double *sumstat, int end, int start, int n, double sh
 }
 
 
-// code to choose cost function  
+// code to choose cost function
 
 const static struct {
   char *name;
@@ -215,7 +215,7 @@ double call_function(const char *name,double *sumstat, int end, int start, int n
 
 
 void min_which(double *array,int n,double *minout,int *maxid){
-	// Function to find minimum of an array with n elements that is put in min 
+	// Function to find minimum of an array with n elements that is put in min
 	*minout=*array;
 	*maxid=0;
 	int i;
@@ -228,7 +228,7 @@ void min_which(double *array,int n,double *minout,int *maxid){
 }
 
 void max_which(double *array,int n,double *maxval,int *maxid){
-	// Function to find maximum of an array with n elements that is put in max 
+	// Function to find maximum of an array with n elements that is put in max
 	*maxval=*array;
 	*maxid=0;
 	int i;
@@ -240,12 +240,12 @@ void max_which(double *array,int n,double *maxval,int *maxid){
 	}
 }
 
-void order_vec( int a[], int n ){   
+void order_vec( int a[], int n ){
 	int i, j;
 	for(i = 0; i < n; i++){         // Make a pass through the array for each element
 	  for(j = 1; j < (n-i); j++){			// Go through the array beginning to end
-			if(a[j-1] > a[j])       // If the the first number is greater, swap it 
-				SWAP(a[j-1],a[j]);   
+			if(a[j-1] > a[j])       // If the the first number is greater, swap it
+				SWAP(a[j-1],a[j]);
 		}
 	}
 }
