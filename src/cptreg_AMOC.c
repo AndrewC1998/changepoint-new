@@ -63,7 +63,7 @@ void CptReg_Normal_AMOC(char **cost_func, double *sumstat, int *n, int *m, int *
 
     //cost with no changepoints
     zero = 0;
-    costfunction(Sumstats, &size, &np1, &p, &minorder, &optimalorder, &maxorder, &zero, n, nulllike, tol, error, shape, MBIC);
+    costfunction(Sumstats, &size, &np1, &p, minorder, optimalorder, maxorder, &zero, n, nulllike, tol, error, shape, MBIC);
     if(*error != 0){
         goto err2;
     }
@@ -72,11 +72,11 @@ void CptReg_Normal_AMOC(char **cost_func, double *sumstat, int *n, int *m, int *
     neval = 0;
     for(tstar = *minseglen; tstar <= (*n - *minseglen); tstar++){
        R_CheckUserInterrupt(); //Has interrupted the R session? quits if true.
-       costfunction(Sumstats, &size, &np1, &p, &minorder, &optimalorder, &maxorder, &zero, &tstar, &seg1cost, tol, error, shape, MBIC);
+       costfunction(Sumstats, &size, &np1, &p, minorder, optimalorder, maxorder, &zero, &tstar, &seg1cost, tol, error, shape, MBIC);
         if(*error != 0){
             goto err2;
         }
-        costfunction(Sumstats, &size, &np1, &p, &minorder, &optimalorder, &maxorder, &tstar, n, &seg2cost, tol, error, shape, MBIC);
+        costfunction(Sumstats, &size, &np1, &p, minorder, optimalorder, maxorder, &tstar, n, &seg2cost, tol, error, shape, MBIC);
         if(*error != 0){
             goto err2;
         }

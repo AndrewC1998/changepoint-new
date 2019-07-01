@@ -12,18 +12,24 @@
 //#include "cost_general_functions.c" // commented out as implicitly in the workspace as using the package.
 
 
-void binseg(cost_func,sumstat,n,pen,Q,cptsout,minseglen,likeout,op_cps, shape)
+void binseg(cost_func, sumstat, n, m, minorder, optimalorder, maxorder, pen, Q, cptsout, error, minseglen, likeout, op_cps, shape, tol, MBIC)
      char **cost_func; //Descibe the cost function used i.e. norm.mean.cost (change in mean in normal distributed data)
      double *sumstat;  //array of summary statistics of the time series
      int *n;			// Length of the time series
+     int *m;     /* number of dimensions (regressors+1) */
+     int *minorder; /* minimum order for mll_ar */
+     int *optimalorder; /* vector of optimal orders per segment */
+     int *maxorder; /* maximum order for mll_ar */
      double *pen;  // Penalty used to decide if a changepoint is significant
      int *Q;			// Max number of changepoints
      int *cptsout;    // Q length vector of identified changepoint locations
+     int *error;   /* 0 by default, nonzero indicates error in code */
      int *minseglen; //minimum segment length
      double *likeout;		// Q length vector of likelihood ratio values for changepoints in cptsout
      int *op_cps;		// Optimal number of changepoint for pen supplied
      double *shape; // only used when cost_func is the gamma likelihood
-
+     double *tol;    // tolerance only for cpt.reg
+     int *MBIC;          // 1 if MBIC penalty, 0 if not
 {
      double oldmax=1.7E+308,null,lambda[*n],maxval;
      int q,p,i,j,maxid,end;
@@ -34,17 +40,13 @@ void binseg(cost_func,sumstat,n,pen,Q,cptsout,minseglen,likeout,op_cps, shape)
      tau[0]=0;
      tau[1]= *n;
 
-    int l = 0;
+    int l = 0; // must use l instead of p
     int np1 = *n + 1; //ncols of summary statistcs array
-    int size = 0;
-    int tol = 0;
+    int size = (*m * (*m + 1)) * 0.5; //nrows of summary statistics array
     int start;  //indicies
     double cost = 0;   //cost over specified segment
-    int error = 0;
-    int MBIC = 0;
-    int minorder = 0;
-    int optimalorder = 0;
-    int maxorder = 0;
+
+	  *error = 0;
 
     void (*costfunction)();
     void mll_var();
@@ -60,7 +62,7 @@ void binseg(cost_func,sumstat,n,pen,Q,cptsout,minseglen,likeout,op_cps, shape)
     void mbic_meanvar_gamma();
     void mbic_meanvar_poisson();
 
-     if (strcmp(*cost_func,"var.norm")==0){
+   if (strcmp(*cost_func,"var.norm")==0){
    costfunction = &mll_var;
    }
    else if (strcmp(*cost_func,"mean.norm")==0){
@@ -106,7 +108,7 @@ costfunction = &mbic_meanvar_poisson;
         i=1;
         start=tau[0];
         end=tau[1];
-        costfunction(&sumstat, size, np1, l, minorder, optimalorder, maxorder, start, end, cost, tol, error, shape, MBIC);
+        costfunction(sumstat, &size, &np1, &l, minorder, optimalorder, maxorder, &start, &end, &cost, tol, error, shape, MBIC);
         null = (-0.5) * cost;
 
         for(j=2;j<(*n-2);j++){
@@ -114,15 +116,15 @@ costfunction = &mbic_meanvar_poisson;
             start=end;
     				i=i+1;
     				end=tau[i];
-              costfunction(&sumstat, size, np1, l, minorder, optimalorder, maxorder, start, end, cost, tol, error, shape, MBIC);
-             null = (-0.5) * cost;
+            costfunction(sumstat, &size, &np1, &l, minorder, optimalorder, maxorder, &start, &end, &cost, tol, error, shape, MBIC);
+            null = (-0.5) * cost;
           }
     			else{
     				if(((j-start)>=*minseglen)&&((end-j)>=*minseglen)){
                         double cost1 = 0;
                         double cost2 = 0;
-                        costfunction(&sumstat, size, np1, p, minorder, optimalorder, maxorder, start, j, cost1, tol, error, shape, MBIC);
-                        costfunction(&sumstat, size, np1, p, minorder, optimalorder, maxorder, start, end, cost2, tol, error, shape, MBIC);
+                        costfunction(sumstat, &size, &np1, &p, minorder, optimalorder, maxorder, &start, &j, &cost1, tol, error, shape, MBIC);
+                        costfunction(sumstat, &size, &np1, &p, minorder, optimalorder, maxorder, &start, &end, &cost2, tol, error, shape, MBIC);
                         lambda[j] =  ((-0.5) * cost1) + ((-0.5)* cost2) - null;
     				}
                 }
@@ -144,109 +146,3 @@ costfunction = &mbic_meanvar_poisson;
 		else{ stop=1; }
 	}
 }
-
-
-// Cost functions
-
-/*
-double mll_var(double *sumstat, int end, int start, int n, double shape){
-  double x3=*(sumstat+end)-*(sumstat+start);
-  if(x3<=0){x3=0.00000000001;}
-  return(n*(log(2*M_PI)+log(x3/n)+1)); // M_PI is in Rmath.h
-}
-
-double mll_meanvar(double *sumstat, int end, int start, int n, double shape){
-  double x2=*(sumstat+n+1+end)-*(sumstat+n+1+start); // this relies on the R code doing things in the correct order!
-  double x=*(sumstat+end)-*(sumstat+start);
-  double sigsq=(x2-((x*x)/n))/n;
-  if(sigsq<=0){sigsq=0.00000000001;}
-  return(n*(log(2*M_PI)+log(sigsq)+1)); // M_PI is in Rmath.h
-}
-
-
-double mll_mean(double *sumstat, int end, int start, int n, double shape){
-  double x2=*(sumstat+n+1+end)-*(sumstat+n+1+start); // this relies on the R code doing things in the correct order!
-  double x=*(sumstat+end)-*(sumstat+start);
-  return(x2-(x*x)/n);
-}
-
-double mll_meanvar_exp(double *sumstat, int end, int start, int n, double shape){
-  double x=*(sumstat+end)-*(sumstat+start);
-  return(2*n*(log(x)-log(n)));
-}
-
-double mll_meanvar_gamma(double *sumstat, int end, int start, int n, double shape){
-  double x=*(sumstat+end)-*(sumstat+start);
-  return(2*n*shape*(log(x)-log(n*shape)));
-}
-
-double mll_meanvar_poisson(double *sumstat, int end, int start, int n, double shape){
-  double x=*(sumstat+end)-*(sumstat+start);
-  if(x==0){return(0);}
-  else{return(2*x*(log(n)-log(x)));}
-}
-
-
-// code to choose cost function
-
-const static struct {
-  char *name;
-  double (*func)(double *sumstat, int end, int start, int n, double shape);
-} function_map [] = {
-  { "norm.var", mll_var},
-  {"norm.mean", mll_mean},
-  {"norm.meanvar", mll_meanvar},
-  {"exp", mll_meanvar_exp},
-  {"gamma", mll_meanvar_gamma},
-  {"poisson", mll_meanvar_poisson},
- };
-
-double call_function(const char *name,double *sumstat, int end, int start, int n, double shape)
-{
-  int k;
-
-  for (k = 0; k <= (sizeof(function_map) / sizeof(function_map[0])); k++) {
-    if (!strcmp(function_map[k].name, name) && function_map[k].func) {
-      return function_map[k].func(sumstat,end,start, n, shape);
- }
- }
-	}
-
-
-
-void min_which(double *array,int n,double *minout,int *maxid){
-	// Function to find minimum of an array with n elements that is put in min
-	*minout=*array;
-	*maxid=0;
-	int i;
-	for(i=1;i<n;i++){
-		if(*(array+i)< *minout){
-			*minout= *(array+i);
-			*maxid=i;
-		}
-	}
-}
-
-void max_which(double *array,int n,double *maxval,int *maxid){
-	// Function to find maximum of an array with n elements that is put in max
-	*maxval=*array;
-	*maxid=0;
-	int i;
-	for(i=1;i<n;i++){
-		if(*(array+i)> *maxval){
-			*maxval= *(array+i);
-			*maxid=i;
-		}
-	}
-}
-
-void order_vec( int a[], int n ){
-	int i, j;
-	for(i = 0; i < n; i++){         // Make a pass through the array for each element
-	  for(j = 1; j < (n-i); j++){			// Go through the array beginning to end
-			if(a[j-1] > a[j])       // If the the first number is greater, swap it
-				SWAP(a[j-1],a[j]);
-		}
-	}
-}
-*/

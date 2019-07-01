@@ -15,8 +15,6 @@
 //#include "cost_general_functions.c"
 #define SWAP(a,b)   { int t; t=a; a=b; b=t; }  // Macro for swapping
 
-//static int *lastchangecpts;
-//static double *lastchangelike;
 static int *checklist;
 static double *tmplike;
 static int *tmpt;
@@ -26,12 +24,10 @@ void FreePELT(error)
 	int *error; /* Error code from PELT C function, non-zero => error */
 	{
 	if(*error==0){
-	//	free((void *)lastchangecpts);
-	 // free((void *)lastchangelike);
 	  free((void *)checklist);
 	  free((void *)tmplike);
 	  free((void *)tmpt);
-    	  free((void *)Sumstats);
+    free((void *)Sumstats);
   }
 }
 
@@ -156,6 +152,7 @@ else if (strcmp(*cost_func,"regquad")==0){
 	if (strcmp(*cost_func,"regquad")==0){
 	  // The sumstat from R for reg is just the design matrix so we need to calculate the actual summary statistics
 	  //Summary statistics
+
 	  double *Sumstats;
 	  Sumstats = (double *)calloc(np1 * size, sizeof(double));
 	  if(Sumstats == NULL){
@@ -181,17 +178,16 @@ else if (strcmp(*cost_func,"regquad")==0){
 
  //Evaluate cost for second minseglen
     for(j = *minseglen; j < (2 * *minseglen); j++){
+			start = 0;
+      costfunction(sumstat, &size, &np1, &p, minorder, optimalorder, maxorder, &start, &j, &segcost, tol, error, shape, MBIC);
 
-	start = 0;
-        costfunction(&sumstat, size, np1, p, *minorder, *optimalorder, *maxorder, start, j, segcost, *tol, *error, *shape, *MBIC);
-
-	lastchangelike[j]=segcost;
+			lastchangelike[j]=segcost;
 
         if(*error != 0){
             goto err4;
         }
-        lastchangecpts[j] = 0;
-        numchangecpts[j] = 1;
+      lastchangecpts[j] = 0;
+      numchangecpts[j] = 1;
     }
 
 //setup checklist
@@ -205,7 +201,7 @@ else if (strcmp(*cost_func,"regquad")==0){
    if ((lastchangelike[tstar]) == 0){
   		for(i=0;i<(nchecklist);i++){
 				start = checklist[i];  //last point of last segment
-				costfunction(&sumstat, size, np1, p, *minorder, *optimalorder, *maxorder, start, tstar, segcost, *tol, *error, *shape, *MBIC);
+				costfunction(sumstat, &size, &np1, &p, minorder, optimalorder, maxorder, &start, &tstar, &segcost, tol, error, shape, MBIC);
 
 				if(*error != 0){
         				goto err5;
@@ -214,7 +210,7 @@ else if (strcmp(*cost_func,"regquad")==0){
 				tmplike[i] = lastchangelike[start] + segcost + *pen;
       }
 
-    min_which(tmplike,nchecklist,&minval,&minid); /*updates minval and minid with min and which element */
+    min_which(tmplike,&nchecklist,&minval,&minid); /*updates minval and minid with min and which element */
     lastchangelike[tstar]=minval;
     lastchangecpts[tstar]=checklist[minid];
     numchangecpts[tstar]=numchangecpts[lastchangecpts[tstar]]+1;
@@ -232,7 +228,7 @@ else if (strcmp(*cost_func,"regquad")==0){
 			//Add new cpt to checklist
 			checklist[nchecklist] = tstar - (*minseglen-1); // atleast 1 obs per seg
 			nchecklist++;
-			
+
   /*  nchecklist=nchecktmp;*/
 
   } // end taustar
