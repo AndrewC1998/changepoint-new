@@ -122,8 +122,8 @@ else if (strcmp(*cost_func,"regquad")==0){
 	costfunction = &mll_ar; //change to ARP() when done but leave like this for now to stop errors when running
 }*/
 
-  //int checklist[*n];
-	int *checklist = (int *)calloc(np1, sizeof(int));
+	int *checklist;
+	checklist = (int *)calloc(np1, sizeof(int));
 	if(checklist==NULL){
 		*error = 1;
 		goto err1;
@@ -184,7 +184,7 @@ else if (strcmp(*cost_func,"regquad")==0){
 			lastchangelike[j]=segcost;
 
         if(*error != 0){
-            goto err4;
+            goto err5;
         }
       lastchangecpts[j] = 0;
       numchangecpts[j] = 1;
