@@ -327,7 +327,7 @@ multiple.var.norm=function(data,mul.method="PELT",penalty="MBIC",pen.value=0,Q=5
   else{
     n=ncol(data)
   }
-  if(n<4){stop('Data must have atleast 4 observations to fit a changepoint model.')}
+  if(n<4){stop('Data must have at least 4 observations to fit a changepoint model.')}
   if(n<(2*minseglen)){stop('Minimum segment length is too large to include a change in this data')}
   
   pen.value = penalty_decision(penalty, pen.value, n, diffparam, asymcheck=costfunc, method=mul.method)
