@@ -49,55 +49,49 @@ void binseg(cost_func, sumstat, n, m, minorder, optimalorder, maxorder, pen, Q, 
 	  *error = 0;
 
     void (*costfunction)();
-    void mll_var();
-    void mll_mean();
-    void mll_meanvar();
-    void mll_meanvar_exp();
-    void mll_meanvar_gamma();
-    void mll_meanvar_poisson();
-    void mbic_var();
-    void mbic_mean();
-    void mbic_meanvar();
-    void mbic_meanvar_exp();
-    void mbic_meanvar_gamma();
-    void mbic_meanvar_poisson();
+    void mean_norm();
+    void var_norm();
+    void meanvar_norm();
+    void meanvar_exp();
+    void meanvar_gamma();
+    void meanvar_poisson();
 
-   if (strcmp(*cost_func,"var.norm")==0){
-   costfunction = &mll_var;
+    if (strcmp(*cost_func,"var.norm")==0){
+    costfunction = &var_norm;
+    }
+    else if (strcmp(*cost_func,"mean.norm")==0){
+    costfunction = &mean_norm;
+    }
+     else if (strcmp(*cost_func,"meanvar.norm")==0){
+   costfunction = &meanvar_norm;
+    }
+    else if (strcmp(*cost_func,"meanvar.exp")==0){
+   costfunction = &meanvar_exp;
    }
-   else if (strcmp(*cost_func,"mean.norm")==0){
-   costfunction = &mll_mean;
+    else if (strcmp(*cost_func,"meanvar.gamma")==0){
+   costfunction = &meanvar_gamma;
    }
-    else if (strcmp(*cost_func,"meanvar.norm")==0){
-  costfunction = &mll_meanvar;
+    else if (strcmp(*cost_func,"meanvar.poisson")==0){
+   costfunction = &meanvar_poisson;
    }
-   else if (strcmp(*cost_func,"meanvar.exp")==0){
-  costfunction = &mll_meanvar_exp;
-  }
-   else if (strcmp(*cost_func,"meanvar.gamma")==0){
-  costfunction = &mll_meanvar_gamma;
-  }
-   else if (strcmp(*cost_func,"meanvar.poisson")==0){
-  costfunction = &mll_meanvar_poisson;
-  }
-   else if (strcmp(*cost_func,"mean.norm.mbic")==0){
-  costfunction = &mbic_mean;
-  }
- else if (strcmp(*cost_func,"var.norm.mbic")==0){
-  costfunction = &mbic_var;
-  }
- else if (strcmp(*cost_func,"meanvar.norm.mbic")==0){
-  costfunction = &mbic_meanvar;
-}
- else if (strcmp(*cost_func,"meanvar.exp.mbic")==0){
-  costfunction = &mbic_meanvar_exp;
-}
- else if (strcmp(*cost_func,"meanvar.gamma.mbic")==0){
-  costfunction = &mbic_meanvar_gamma;
-}
- else if (strcmp(*cost_func,"meanvar.poisson.mbic")==0){
-costfunction = &mbic_meanvar_poisson;
-}
+    else if (strcmp(*cost_func,"mean.norm.mbic")==0){
+   costfunction = &mean_norm;
+   }
+  else if (strcmp(*cost_func,"var.norm.mbic")==0){
+   costfunction = &var_norm;
+   }
+  else if (strcmp(*cost_func,"meanvar.norm.mbic")==0){
+   costfunction = &meanvar_norm;
+ }
+  else if (strcmp(*cost_func,"meanvar.exp.mbic")==0){
+   costfunction = &meanvar_exp;
+ }
+  else if (strcmp(*cost_func,"meanvar.gamma.mbic")==0){
+   costfunction = &meanvar_gamma;
+ }
+  else if (strcmp(*cost_func,"meanvar.poisson.mbic")==0){
+   costfunction = &meanvar_poisson;
+ }
 
      void max_which();
      void order_vec();

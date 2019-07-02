@@ -2,8 +2,12 @@ PELT = function(sumstat, pen=0, cost_func = "norm.mean", shape = 1, minseglen = 
   # function that uses the PELT method to calculate changes in mean where the segments in the data are assumed to be Normal
   n = length(sumstat[,1])
   m = length(sumstat[1,])
-  MBIC = 0
   tol = 0
+  if(cost_func == "norm.mean" || cost_func == "var.norm" || cost_func == "meanvar.norm" || cost_func == "meanvar.exp" || cost_func == "meanvar.gamma" || cost_func == "meanvar.poisson"){
+    MBIC = 0
+  }else{
+    MBIC = 1
+  }
   if(n<2){stop('Data must have at least 2 observations to fit a changepoint model.')}
 
   storage.mode(sumstat) = 'double'

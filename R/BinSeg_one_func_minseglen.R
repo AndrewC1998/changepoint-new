@@ -3,7 +3,11 @@ BINSEG = function(sumstat, pen = 0, cost_func = "norm.mean", shape = 1, minsegle
   n = length(sumstat[,1])
   m = length(sumstat[1,])
   tol = 0
-  MBIC = 0
+  if(cost_func == "norm.mean" || cost_func == "var.norm" || cost_func == "meanvar.norm" || cost_func == "meanvar.exp" || cost_func == "meanvar.gamma" || cost_func == "meanvar.poisson"){
+    MBIC = 0
+  }else{
+    MBIC = 1
+  }
   if(n<2){stop('Data must have at least 2 observations to fit a changepoint model.')}
   if(Q>((n/2)+1)){stop(paste('Q is larger than the maximum number of segments',(n/2)+1))}
   if(Q<=0){stop(paste('Q is the maximum number of changepoints so should be greater than 0'))}

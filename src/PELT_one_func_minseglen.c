@@ -63,57 +63,51 @@ void PELT(cost_func, sumstat, n, m, pen, cptsout, error, shape, minorder, optima
 	  int tstar,i,j,minid; // minid previously whichout
 
 void (*costfunction)();
-void mll_var();
-void mll_mean();
-void mll_meanvar();
-void mll_meanvar_exp();
-void mll_meanvar_gamma();
-void mll_meanvar_poisson();
-void mbic_var();
-void mbic_mean();
-void mbic_meanvar();
-void mbic_meanvar_exp();
-void mbic_meanvar_gamma();
-void mbic_meanvar_poisson();
+void mean_norm();
+void var_norm();
+void meanvar_norm();
+void meanvar_exp();
+void meanvar_gamma();
+void meanvar_poisson();
 void mll_reg();
 //void mll_ar();
 
 
    if (strcmp(*cost_func,"var.norm")==0){
-   costfunction = &mll_var;
+   costfunction = &var_norm;
    }
    else if (strcmp(*cost_func,"mean.norm")==0){
-   costfunction = &mll_mean;
+   costfunction = &mean_norm;
    }
     else if (strcmp(*cost_func,"meanvar.norm")==0){
-  costfunction = &mll_meanvar;
+  costfunction = &meanvar_norm;
    }
    else if (strcmp(*cost_func,"meanvar.exp")==0){
-  costfunction = &mll_meanvar_exp;
+  costfunction = &meanvar_exp;
   }
    else if (strcmp(*cost_func,"meanvar.gamma")==0){
-  costfunction = &mll_meanvar_gamma;
+  costfunction = &meanvar_gamma;
   }
    else if (strcmp(*cost_func,"meanvar.poisson")==0){
-  costfunction = &mll_meanvar_poisson;
+  costfunction = &meanvar_poisson;
   }
    else if (strcmp(*cost_func,"mean.norm.mbic")==0){
-  costfunction = &mbic_mean;
+  costfunction = &mean_norm;
   }
  else if (strcmp(*cost_func,"var.norm.mbic")==0){
-  costfunction = &mbic_var;
+  costfunction = &var_norm;
   }
  else if (strcmp(*cost_func,"meanvar.norm.mbic")==0){
-  costfunction = &mbic_meanvar;
+  costfunction = &meanvar_norm;
 }
  else if (strcmp(*cost_func,"meanvar.exp.mbic")==0){
-  costfunction = &mbic_meanvar_exp;
+  costfunction = &meanvar_exp;
 }
  else if (strcmp(*cost_func,"meanvar.gamma.mbic")==0){
-  costfunction = &mbic_meanvar_gamma;
+  costfunction = &meanvar_gamma;
 }
  else if (strcmp(*cost_func,"meanvar.poisson.mbic")==0){
-  costfunction = &mbic_meanvar_poisson;
+  costfunction = &meanvar_poisson;
 }
 else if (strcmp(*cost_func,"regquad")==0){
  	costfunction = &mll_reg;
@@ -183,9 +177,15 @@ else if (strcmp(*cost_func,"regquad")==0){
 
 			lastchangelike[j]=segcost;
 
+			if(strcmp(*cost_func,"regquad")==0){
         if(*error != 0){
             goto err5;
         }
+			}else{
+				if(*error != 0){
+            goto err4;
+        }
+			}
       lastchangecpts[j] = 0;
       numchangecpts[j] = 1;
     }
@@ -203,10 +203,15 @@ else if (strcmp(*cost_func,"regquad")==0){
 				start = checklist[i];  //last point of last segment
 				costfunction(sumstat, &size, &np1, &p, minorder, optimalorder, maxorder, &start, &tstar, &segcost, tol, error, shape, MBIC);
 
-				if(*error != 0){
-        				goto err5;
-        			}
-
+				if(strcmp(*cost_func,"regquad")==0){
+	        if(*error != 0){
+	            goto err5;
+	        }
+				}else{
+					if(*error != 0){
+	            goto err4;
+	        }
+				}
 				tmplike[i] = lastchangelike[start] + segcost + *pen;
       }
 
