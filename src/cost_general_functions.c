@@ -17,7 +17,7 @@
 // Cost functions
 
 void mean_norm(double *SS, int *size, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-    double l = end - start;
+    double l = *end - *start;
     double x = SS[ *end ]  - SS[ *start ];
     double x2 = SS[ *n + *end ] - SS[ *n + *start ];
     if(MBIC == 0){
@@ -28,7 +28,7 @@ void mean_norm(double *SS, int *size, int *n, int *p, int *minorder, int *optima
 }
 
 void var_norm(double *SS, int *size, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-    double l = end - start;
+    double l = *end - *start;
     double x3 = SS[ *n + *n + *end ] - SS[ *n + *n + *start ];
     if(x3<=0){
         x3=0.00000000001;
@@ -41,7 +41,7 @@ void var_norm(double *SS, int *size, int *n, int *p, int *minorder, int *optimal
 }
 
 void meanvar_norm(double *SS, int *size, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-    double l = end - start;
+    double l = *end - *start;
     double x = SS[ *end ]  - SS[ *start ];
     double x2 = SS[ *n + *end ] - SS[ *n + *start ];
     double sigsq=(x2-((x*x)/l))/l;
@@ -56,7 +56,7 @@ void meanvar_norm(double *SS, int *size, int *n, int *p, int *minorder, int *opt
 }
 
 void meanvar_exp(double *SS, int *size, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-    double l = end - start;
+    double l = *end - *start;
     double x = SS[ *end ]  - SS[ *start ];
     if(MBIC == 0){
       *cost = 2*l*(log(x)-log(l));
@@ -66,7 +66,7 @@ void meanvar_exp(double *SS, int *size, int *n, int *p, int *minorder, int *opti
 }
 
 void meanvar_gamma(double *SS, int *size, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-    double l = end - start;
+    double l = *end - *start;
     double x = SS[ *end ]  - SS[ *start ];
     if(MBIC == 0){
       *cost = 2*l*(*shape)*(log(x)-log(l*(*shape)));
@@ -76,7 +76,7 @@ void meanvar_gamma(double *SS, int *size, int *n, int *p, int *minorder, int *op
 }
 
 void meanvar_poisson(double *SS, int *size, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
-    double l = end - start;
+    double l = *end - *start;
     double x = SS[ *end ]  - SS[ *start ];
     if(x==0){
         *cost = 0;
