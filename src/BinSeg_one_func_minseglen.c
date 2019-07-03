@@ -122,10 +122,10 @@ void binseg(cost_func, sumstat, n, m, pen, Q, cptsout, error, minorder, optimalo
         }
 
     max_which(lambda,*n,&maxval,&maxid);
-    *(cptsout+q)=maxid;
-		*(likeout+q)= (oldmax<=maxval) ? oldmax : maxval ;
+    *(cptsout+q) = maxid;
+		*(likeout+q) = (oldmax<=maxval) ? oldmax : maxval ;
     oldmax= *(likeout+q);
-		tau[q+2]=maxid;
+		tau[q+2] = maxid;
     order_vec(tau,q+3);
   }
 

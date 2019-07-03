@@ -330,10 +330,11 @@ void min_which(double *array, int *n, double *minval, int *minid){
 
 void order_vec( int a[], int n ){
   int i, j;
-  for(i = 0; i < n; i++){         // Make a pass through the array for each element
-                                  for(j = 1; j < (n-i); j++){  		// Go through the array beginning to end
-                                                                 if(a[j-1] > a[j])       // If the the first number is greater, swap it
-                                                                 SWAP(a[j-1],a[j]);
-                                  }
+  for(i = 0; i < n; i++){  // Make a pass through the array for each element
+    for(j = 1; j < (n-i); j++){  		// Go through the array beginning to end
+      if(a[j-1] > a[j]){       // If the the first number is greater, swap it
+        SWAP(a[j-1],a[j]);
+      }
+    }
   }
 }
