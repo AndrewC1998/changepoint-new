@@ -145,12 +145,12 @@ CptReg_AMOC_Normal <- function(data, penalty="MBIC", penalty.value=0, minseglen=
 
   ##Clean-up on exit
   answer=list()
-  answer[[5]]=1
+  answer[[6]]=1
   on.exit(.C("Free_CptReg_Normal_AMOC",answer[[6]],PACKAGE="changepoint"))
 
   answer <- .C("CptReg_Normal_AMOC", cost_func=cost_func, sumstat=as.double(data), n=as.integer(n),
-    m=as.integer(p+1), minorder=as.integer(0), optimalorder = as.integer(0), maxorder = as.integer(0), pen=as.double(penalty.value), err=0L,
-    shape=as.double(shape), minseglen=as.integer(minseglen), tol=as.double(tol),
+    m=as.integer(p+1), pen=as.double(penalty.value), err=0L,
+    shape=as.double(shape), minorder=as.integer(0), optimalorder = as.integer(0), maxorder = as.integer(0), minseglen=as.integer(minseglen), tol=as.double(tol),
     tau=0L, nulllike=vector("double",1), taulike=vector("double",1),
     tmplike=vector("double",n), MBIC=as.integer(MBIC),PACKAGE="changepoint")
 
@@ -178,10 +178,10 @@ CptReg_PELT_Normal <- function(data, penalty.value=0, minseglen=3, shape=0,
 
   #Check if error has occured
   answer=list()
-  answer[[6]]=1
-  on.exit(.C("FreePELT",answer[[6]]))
+  answer[[7]]=1
+  on.exit(.C("FreePELT",answer[[7]]))
 
-  answer <- .C('PELT', cost_func=cost_func, sumstat=as.double(data), n=as.integer(n), m=as.integer(p+1), minorder=as.integer(0), optimalorder = as.integer(0), maxorder = as.integer(0), pen=as.double(penalty.value), cptsout=vector("integer",n), error=as.integer(err), shape=as.double(shape), minseglen=as.integer(minseglen), tol=as.double(tol), lastchangelike=vector("double",n+1), lastchangecpts=vector("integer",n+1), numchangecpts=vector("integer",n+1), MBIC=as.integer(MBIC))
+  answer <- .C('PELT', cost_func=cost_func, sumstat=as.double(data), n=as.integer(n), m=as.integer(p+1), pen=as.double(penalty.value), cptsout=vector("integer",n), error=as.integer(err), shape=as.double(shape), minorder=as.integer(0), optimalorder = as.integer(0), maxorder = as.integer(0), minseglen=as.integer(minseglen), tol=as.double(tol), lastchangelike=vector("double",n+1), lastchangecpts=vector("integer",n+1), numchangecpts=vector("integer",n+1), MBIC=as.integer(MBIC))
 
 
   if(answer$err!=0){

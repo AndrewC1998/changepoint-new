@@ -15,8 +15,8 @@
 static double *Sumstats;
 
 //Determine cpts for Normal regression under method AMOC
-void CptReg_Normal_AMOC(char **cost_func, double *sumstat, int *n, int *m, int *minorder, int *optimalorder, int *maxorder, double *pen,
-                        int *error, double *shape, int *minseglen, double *tol, int *tau,
+void CptReg_Normal_AMOC(char **cost_func, double *sumstat, int *n, int *m, double *pen,
+                        int *error, double *shape, int *minorder, int *optimalorder, int *maxorder, int *minseglen, double *tol, int *tau,
                         double *nulllike, double *taulike, double *tmplike, int *MBIC){
 
     //sumstat        - vectorised matrix of size n x m
