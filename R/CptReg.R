@@ -167,7 +167,6 @@ CptReg_AMOC_Normal <- function(data, penalty="MBIC", penalty.value=0, minseglen=
 
 CptReg_PELT_Normal <- function(data, penalty.value=0, minseglen=3, shape=0,
   MBIC=0, tol=1e-07){
-  #costfunc <- "regquad"
   n <- as.integer(nrow(data))
   p <- as.integer(ncol(data)-1)
   cost_func <- "regquad"
