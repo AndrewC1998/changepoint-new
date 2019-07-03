@@ -12,18 +12,18 @@
 //#include "cost_general_functions.c" // commented out as implicitly in the workspace as using the package.
 
 
-void binseg(cost_func, sumstat, n, m, minorder, optimalorder, maxorder, pen, Q, cptsout, error, minseglen, likeout, op_cps, shape, tol, MBIC)
+void binseg(cost_func, sumstat, n, m, pen, Q, cptsout, error, minorder, optimalorder, maxorder, minseglen, likeout, op_cps, shape, tol, MBIC)
      char **cost_func; //Descibe the cost function used i.e. norm.mean.cost (change in mean in normal distributed data)
      double *sumstat;  //array of summary statistics of the time series
      int *n;			// Length of the time series
      int *m;     /* number of dimensions (regressors+1) */
-     int *minorder; /* minimum order for mll_ar */
-     int *optimalorder; /* vector of optimal orders per segment */
-     int *maxorder; /* maximum order for mll_ar */
      double *pen;  // Penalty used to decide if a changepoint is significant
      int *Q;			// Max number of changepoints
      int *cptsout;    // Q length vector of identified changepoint locations
      int *error;   /* 0 by default, nonzero indicates error in code */
+     int *minorder; /* minimum order for mll_ar */
+     int *optimalorder; /* vector of optimal orders per segment */
+     int *maxorder; /* maximum order for mll_ar */
      int *minseglen; //minimum segment length
      double *likeout;		// Q length vector of likelihood ratio values for changepoints in cptsout
      int *op_cps;		// Optimal number of changepoint for pen supplied
@@ -45,8 +45,6 @@ void binseg(cost_func, sumstat, n, m, minorder, optimalorder, maxorder, pen, Q, 
     int size = (*m * (*m + 1)) * 0.5; //nrows of summary statistics array
     int start;  //indicies
     double cost = 0;   //cost over specified segment
-
-	  *error = 0;
 
     void (*costfunction)();
     void mean_norm();
@@ -98,7 +96,7 @@ void binseg(cost_func, sumstat, n, m, minorder, optimalorder, maxorder, pen, Q, 
 
     for(q=0;q<*Q;q++){
       R_CheckUserInterrupt(); // checks if user has interrupted the R session and quits if true
-      for(p=0;p<*n;p++){lambda[p]=0;}
+       for(p=0;p<*n;p++){lambda[p]=0;}
         i=1;
         start=tau[0];
         end=tau[1];
@@ -106,26 +104,24 @@ void binseg(cost_func, sumstat, n, m, minorder, optimalorder, maxorder, pen, Q, 
         null = (-0.5) * cost;
 
         for(j=2;j<(*n-2);j++){
-          if(j==end){
+           if(j==end){
             start=end;
     				i=i+1;
     				end=tau[i];
             costfunction(sumstat, &size, &np1, &l, minorder, optimalorder, maxorder, &start, &end, &cost, tol, error, shape, MBIC);
             null = (-0.5) * cost;
-          }
-    			else{
-    				if(((j-start)>=*minseglen)&&((end-j)>=*minseglen)){
+          }else{
+    				 if(((j-start)>=*minseglen)&&((end-j)>=*minseglen)){
                         double cost1 = 0;
                         double cost2 = 0;
                         costfunction(sumstat, &size, &np1, &p, minorder, optimalorder, maxorder, &start, &j, &cost1, tol, error, shape, MBIC);
                         costfunction(sumstat, &size, &np1, &p, minorder, optimalorder, maxorder, &start, &end, &cost2, tol, error, shape, MBIC);
                         lambda[j] =  ((-0.5) * cost1) + ((-0.5)* cost2) - null;
-    				}
-                }
+            }
+    			}
         }
 
-  max_which(lambda,*n,&maxval,&maxid);
-
+    max_which(lambda,*n,&maxval,&maxid);
     *(cptsout+q)=maxid;
 		*(likeout+q)= (oldmax<=maxval) ? oldmax : maxval ;
     oldmax= *(likeout+q);

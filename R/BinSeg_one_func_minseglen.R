@@ -1,6 +1,6 @@
 BINSEG = function(sumstat, pen = 0, cost_func = "norm.mean", shape = 1, minseglen = 2,  Q=5){
 
-  n = length(sumstat[,1])
+  n = length(sumstat[,1]) - 1
   m = length(sumstat[1,])
   tol = 0
   if(cost_func == "norm.mean" || cost_func == "var.norm" || cost_func == "meanvar.norm" || cost_func == "meanvar.exp" || cost_func == "meanvar.gamma" || cost_func == "meanvar.poisson"){
@@ -25,10 +25,9 @@ BINSEG = function(sumstat, pen = 0, cost_func = "norm.mean", shape = 1, minsegle
   max = 0
   error = 0
 
-  answer=.C('binseg', cost_func, sumstat, as.integer(n), as.integer(m), as.integer(min), as.integer(optimal), as.integer(max), as.double(pen), as.integer(Q), cptsout, as.integer(error), as.integer(minseglen), likeout, as.integer(op_cps), as.double(shape), as.double(tol), as.integer(MBIC))
-  if(answer[[9]]==Q){warning('The number of changepoints identified is Q, it is advised to increase Q to make sure changepoints have not been missed.')}
-  if(answer[[9]]==0){cpts=n}
-  else{cpts=c(sort(answer[[6]][1:answer[[9]]]),n)}
-  return(list(cps=rbind(answer[[6]],2*answer[[8]]),cpts=cpts,op.cpts=answer[[9]],pen=pen))
-  ##answer[6] is cptsout, answer[8] is likeout ("beta value")
+  answer=.C('binseg', cost_func = cost_func, sumstat = sumstat, n = as.integer(n), m = as.integer(m), pen = as.double(pen), Q = as.integer(Q), cptsout = cptsout, error = as.integer(error), minorder = as.integer(min), optimalorder = as.integer(optimal), maxorder = as.integer(max), minseglen = as.integer(minseglen), likeout = likeout, op_cps = as.integer(op_cps), shape = as.double(shape), tol = as.double(tol), MBIC = as.integer(MBIC))
+  if(answer$op_cps == Q){warning('The number of changepoints identified is Q, it is advised to increase Q to make sure changepoints have not been missed.')}
+  if(answer$op_cps == 0){cpts=n}
+  else{cpts=c(sort(answer$cptsout[1:answer$op_cps]),n)}
+  return(list(cps=rbind(answer$cptsout,2*answer$likeout),cpts=cpts,op.cpts=answer$op_cps,pen=pen))
   }

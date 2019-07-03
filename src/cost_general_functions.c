@@ -291,7 +291,7 @@ void RegQuadCost_SS(double *X, int *n, int *nc, double *SS, int *m){
 
 
 //Find the maximum case
-void max_which(double *array, int *n, double *maxval, int *maxid){
+void max_which(double *array, int n, double *maxval, int *maxid){
   //array - values for which to find the maximum
   //n - number of items to search
   //maxval - maximum value
@@ -299,7 +299,7 @@ void max_which(double *array, int *n, double *maxval, int *maxid){
   int i;
   *maxid = 0;
   *maxval = array[*maxid];
-  for(i = 1; i < *n; i++){
+  for(i = 1; i < n; i++){
     if(array[i] > *maxval){
       *maxid = i;
       *maxval = array[i];
