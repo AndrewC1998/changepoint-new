@@ -20,7 +20,7 @@ void mean_norm(double *SS, int *size, int *n, int *p, int *minorder, int *optima
     double l = *end - *start;
     double x = SS[ *end ]  - SS[ *start ];
     double x2 = SS[ *n + *end ] - SS[ *n + *start ];
-    if(MBIC == 0){
+    if(*MBIC == 0){
       *cost = x2 - (x*x)/l;
     }else{
       *cost = x2-(x*x)/l+log(l);
@@ -33,7 +33,7 @@ void var_norm(double *SS, int *size, int *n, int *p, int *minorder, int *optimal
     if(x3<=0){
         x3=0.00000000001;
     }
-    if(MBIC == 0){
+    if(*MBIC == 0){
       *cost = l*(log(2*M_PI)+log(x3/l)+1);        /* M_PI is in Rmath.h  */
     }else{
       *cost = l*(log(2*M_PI)+log(x3/l)+1)+log(l); /* M_PI is in Rmath.h  */
@@ -48,7 +48,7 @@ void meanvar_norm(double *SS, int *size, int *n, int *p, int *minorder, int *opt
     if(sigsq<=0){
       sigsq=0.00000000001;
     }
-    if(MBIC == 0){
+    if(*MBIC == 0){
       *cost = l*(log(2*M_PI)+log(sigsq)+1); /* M_PI is in Rmath.h */
     }else{
       *cost = l*(log(2*M_PI)+log(sigsq)+1)+log(l); /* M_PI is in Rmath.h  */
@@ -58,7 +58,7 @@ void meanvar_norm(double *SS, int *size, int *n, int *p, int *minorder, int *opt
 void meanvar_exp(double *SS, int *size, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
     double l = *end - *start;
     double x = SS[ *end ]  - SS[ *start ];
-    if(MBIC == 0){
+    if(*MBIC == 0){
       *cost = 2*l*(log(x)-log(l));
     }else{
       *cost = 2*l*(log(x)-log(l))+log(l);
@@ -68,7 +68,7 @@ void meanvar_exp(double *SS, int *size, int *n, int *p, int *minorder, int *opti
 void meanvar_gamma(double *SS, int *size, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
     double l = *end - *start;
     double x = SS[ *end ]  - SS[ *start ];
-    if(MBIC == 0){
+    if(*MBIC == 0){
       *cost = 2*l*(*shape)*(log(x)-log(l*(*shape)));
     }else{
       *cost = 2*l*(*shape)*(log(x)-log(l*(*shape)))+log(l);
@@ -81,7 +81,7 @@ void meanvar_poisson(double *SS, int *size, int *n, int *p, int *minorder, int *
     if(x==0){
         *cost = 0;
     }else{
-      if(MBIC == 0){
+      if(*MBIC == 0){
         *cost = 2*x*(log(l)-log(x));
       }else{
         *cost = 2*x*(log(l)-log(x))+log(l);
