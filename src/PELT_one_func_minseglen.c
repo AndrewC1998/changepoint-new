@@ -51,7 +51,7 @@ void PELT(cost_func, sumstat, n, m, pen, cptsout, error, shape, minorder, optima
   int *MBIC;          // 1 if MBIC penalty, 0 if not
   {
 	// R code does know.mean and fills mu if necessary
-    
+
 	  int p = *m - 1;   //number or regressors
 	  int np1 = *n + 1; // length of time series +1 for convenience
 	  int size = (*m * (*m + 1)) * 0.5; //nrows of summary statistics array
@@ -173,11 +173,10 @@ else if (strcmp(*cost_func,"regquad")==0){
   }
 
  //Evaluate cost for second minseglen
-    for(j = *minseglen; j < (2 * *minseglen); j++){
-			start = 0;
+  start = 0;
+	for(j = *minseglen; j < (2 * *minseglen); j++){
       costfunction(sumstat, &size, &np1, &p, minorder, optimalorder, maxorder, &start, &j, &segcost, tol, error, shape, MBIC);
-
-			lastchangelike[j]=segcost;
+      lastchangelike[j]=segcost;
 
 			if(strcmp(*cost_func,"regquad")==0){
         if(*error != 0){

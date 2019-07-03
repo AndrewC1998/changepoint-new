@@ -3,7 +3,7 @@ PELT = function(sumstat, pen=0, cost_func = "norm.mean", shape = 1, minseglen = 
   n = length(sumstat[,1])-1
   m = length(sumstat[1,])
   tol = 0
-  if(cost_func == "norm.mean" || cost_func == "var.norm" || cost_func == "meanvar.norm" || cost_func == "meanvar.exp" || cost_func == "meanvar.gamma" || cost_func == "meanvar.poisson"){
+  if(cost_func == "mean.norm" || cost_func == "var.norm" || cost_func == "meanvar.norm" || cost_func == "meanvar.exp" || cost_func == "meanvar.gamma" || cost_func == "meanvar.poisson"){
     MBIC = 0
   }else{
     MBIC = 1
