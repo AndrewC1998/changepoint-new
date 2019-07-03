@@ -32,13 +32,13 @@ PELT = function(sumstat, pen=0, cost_func = "norm.mean", shape = 1, minseglen = 
   optimal = 0
   max = 0
 
-  answer=.C('PELT', cost_func, sumstat, as.integer(n), as.integer(m), as.double(pen), cptsout, as.integer(error), as.double(shape), as.integer(min), as.integer(optimal), as.integer(max), as.integer(minseglen), as.double(tol), lastchangelike, lastchangecpts, numchangecpts, as.integer(MBIC))
+  answer=.C('PELT', cost_func = cost_func, sumstat = sumstat, n = as.integer(n), m = as.integer(m), pen = as.double(pen), cptsout = cptsout, error = as.integer(error), shape = as.double(shape), minorder = as.integer(min), optimalorder = as.integer(optimal), maxorder = as.integer(max), minseglen = as.integer(minseglen), tol = as.double(tol), lastchangelike = lastchangelike, lastchangecpts = lastchangecpts, numchangecpts = numchangecpts, MBIC = as.integer(MBIC))
 
 
-  if(answer[[7]]>0){
-    stop("C code error:",answer[[7]],call.=F)
+  if(answer$error>0){
+    stop("C code error:",answer$error,call.=F)
   }
 
-  return(list(lastchangecpts=answer[[15]],cpts=sort(answer[[6]][answer[[6]]>0]), lastchangelike=answer[[14]], ncpts=answer[[16]]))
+  return(list(lastchangecpts=answer$lastchangecpts,cpts=sort(answer$cptsout[answer$cptsout>0]), lastchangelike=answer$lastchangelike, ncpts=answer$numchangecpts))
 
 }

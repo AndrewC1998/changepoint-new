@@ -158,9 +158,7 @@ else if (strcmp(*cost_func,"regquad")==0){
 
 	  void RegQuadCost_SS();
 	  RegQuadCost_SS(sumstat, n, m, Sumstats, &size);
-		memcpy(sumstat, Sumstats, sizeof(*Sumstats));
-		Rprintf("sumstat: %f, %f, Sumstats: %f, %f",sumstat[1],sumstat[2],Sumstats[1],Sumstats[2]);
-	  //sumstat = Sumstats; // updates sumstat to be the actual summary statistics
+      sumstat = Sumstats; // updates sumstat to be the actual summary statistics
 	}
 
   //Initialise
