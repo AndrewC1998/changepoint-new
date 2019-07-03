@@ -1,4 +1,4 @@
-BINSEG = function(sumstat, pen = 0, cost_func = "norm.mean", shape = 1, minseglen = 2,  Q=5){
+BINSEG = function(sumstat, pen = 0, cost_func = "mean.norm", shape = 1, minseglen = 2,  Q=5){
 
   n = length(sumstat[,1]) - 1
   m = length(sumstat[1,])
