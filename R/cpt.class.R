@@ -341,9 +341,13 @@ setReplaceMethod("cpts", "cpt", function(object, value) {
         n=length(object@data.set)-1
     }
     else{n=length(object@data.set)}
-    
-    if(value[length(value)]==n){object@cpts <- value}
-    else{        object@cpts <- c(value,n)  }
+    if(length(value)==0){ # R version 3.6 no longer allows this without being explicit
+      object@cpts=n
+    }
+    else{
+      if(value[length(value)]==n){object@cpts <- value}
+      else{        object@cpts <- c(value,n)  }
+    }
     return(object)
 })
 setReplaceMethod("cpts", "cpt.reg", function(object, value) {

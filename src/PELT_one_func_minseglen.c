@@ -51,7 +51,7 @@ void PELT(cost_func, sumstat, n, m, pen, cptsout, error, shape, minorder, optima
   int *MBIC;          // 1 if MBIC penalty, 0 if not
   {
 	// R code does know.mean and fills mu if necessary
-
+    
 	  int p = *m - 1;   //number or regressors
 	  int np1 = *n + 1; // length of time series +1 for convenience
 	  int size = (*m * (*m + 1)) * 0.5; //nrows of summary statistics array
@@ -61,6 +61,7 @@ void PELT(cost_func, sumstat, n, m, pen, cptsout, error, shape, minorder, optima
 	  *error = 0;
 	  double minval; // previously minout
 	  int tstar,i,j,minid; // minid previously whichout
+
 
 void (*costfunction)();
 void mean_norm();
@@ -112,9 +113,10 @@ void mll_reg();
 else if (strcmp(*cost_func,"regquad")==0){
  	costfunction = &mll_reg;
 }
-/*else if (strcmp(*cost_func,"ar.norm")==0){
-	costfunction = &mll_ar; //change to ARP() when done but leave like this for now to stop errors when running
-}*/
+//else if (strcmp(*cost_func,"ar.norm")==0){
+//	costfunction = &mll_ar; //change to ARP() when done but leave like this for now to stop errors when running
+//}
+
 
 	int *checklist;
 	checklist = (int *)calloc(np1, sizeof(int));
@@ -198,7 +200,7 @@ else if (strcmp(*cost_func,"regquad")==0){
   checklist[1]=*minseglen;
 
   for(tstar=2 * (*minseglen); tstar < np1;tstar++){
-    R_CheckUserInterrupt(); /* checks if user has interrupted the R session and quits if true */
+    R_CheckUserInterrupt(); // checks if user has interrupted the R session and quits if true
 
    if ((lastchangelike[tstar]) == 0){
   		for(i=0;i<(nchecklist);i++){
@@ -217,12 +219,12 @@ else if (strcmp(*cost_func,"regquad")==0){
 				tmplike[i] = lastchangelike[start] + segcost + *pen;
       }
 
-    min_which(tmplike,&nchecklist,&minval,&minid); /*updates minval and minid with min and which element */
+    min_which(tmplike,&nchecklist,&minval,&minid); // updates minval and minid with min and which element 
     lastchangelike[tstar]=minval;
     lastchangecpts[tstar]=checklist[minid];
     numchangecpts[tstar]=numchangecpts[lastchangecpts[tstar]]+1;
 
-    /* Update checklist for next iteration, first element is next tau */
+    // Update checklist for next iteration, first element is next tau
       nchecktmp=0;
 			for(i = 0; i < nchecklist; i++){
 				if(tmplike[i] <= (lastchangelike[tstar] +*pen)){
@@ -231,12 +233,12 @@ else if (strcmp(*cost_func,"regquad")==0){
 				}
 			}
 			nchecklist = nchecktmp;
-			}
-			//Add new cpt to checklist
-			checklist[nchecklist] = tstar - (*minseglen-1); // atleast 1 obs per seg
-			nchecklist++;
+		}
+		//Add new cpt to checklist
+		checklist[nchecklist] = tstar - (*minseglen-1); // atleast 1 obs per seg
+		nchecklist++;
 
-  /*  nchecklist=nchecktmp;*/
+    //  nchecklist=nchecktmp;
 
   } // end taustar
 
@@ -248,6 +250,7 @@ else if (strcmp(*cost_func,"regquad")==0){
         last = lastchangecpts[last];
         ncpts++;
     }
+	
 	err5:  free(Sumstats);
 	err4:  free(tmpt);
 	err3:  free(tmplike);
@@ -255,4 +258,5 @@ else if (strcmp(*cost_func,"regquad")==0){
  // err3:  free(lastchangelike);
  // err2:  free(lastchangecpts);
   err1:  return;
+
 }
