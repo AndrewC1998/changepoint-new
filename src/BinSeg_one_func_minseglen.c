@@ -111,11 +111,11 @@ void binseg(cost_func, sumstat, n, m, pen, Q, cptsout, error, minorder, optimalo
             costfunction(sumstat, &size, &np1, &l, minorder, optimalorder, maxorder, &start, &end, &cost, tol, error, shape, MBIC);
             null = (-0.5) * cost;
           }else{
-    				 if(((j-start)>=*minseglen)&&((end-j)>=*minseglen)){
+    				 if(((j-start-1)>=*minseglen)&&((end-j)>=*minseglen)){
                         double cost1 = 0;
                         double cost2 = 0;
                         costfunction(sumstat, &size, &np1, &p, minorder, optimalorder, maxorder, &start, &j, &cost1, tol, error, shape, MBIC);
-                        costfunction(sumstat, &size, &np1, &p, minorder, optimalorder, maxorder, &start, &end, &cost2, tol, error, shape, MBIC);
+                        costfunction(sumstat, &size, &np1, &p, minorder, optimalorder, maxorder, &j, &end, &cost2, tol, error, shape, MBIC);
                         lambda[j] =  ((-0.5) * cost1) + ((-0.5)* cost2) - null;
             }
     			}
