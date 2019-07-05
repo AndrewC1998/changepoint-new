@@ -28,12 +28,8 @@ data <- list(singmeandata,mulmeandata, nochangedata, singvardata, mulvardata, mu
 
 designdata <- list(singmeandata,mulmeandata, nochangedata, singvardata, mulvardata, mulmeanvardata, mulmeanvarexpdata, mulmeanvarpoisdata, constantdata)
 for(i in 1:length(designdata)){
- for(j in 0:10){
-  if(j==0){
-    suppressWarnings(expect_error(design(data[[i]], j), "attempt to select less than one element in integerOneIndex"))
-  }else{
-    expect_equal(class(design(data[[i]],j)), "matrix")
-  } 
+ for(j in 1:10){
+  expect_equal(class(design(data[[i]],j)), "matrix")
  }
 }
 
