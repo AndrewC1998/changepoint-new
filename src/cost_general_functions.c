@@ -89,6 +89,43 @@ void meanvar_poisson(double *SS, int *size, int *n, int *p, int *minorder, int *
     }
 }
 
+/* void mll_ar(double *SS, int *m, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
+
+    int tmpcost = 0;
+    //double tmplike = 0;
+    double tempSS;
+    //tempSS = (double *)calloc(*n * *m, sizeof(double));
+    void RegQuadCost_SS();
+    void mll_reg();
+
+    //RegQuadCost_SS(*SS, (*n-1), (*p+1), tempSS, *m);
+    // mll_reg(tempSS, *m, *n, *p, *minorder, *optimalorder, *maxorder, *start, *end, *cost, *tol, *error, *shape, *MBIC);
+
+    //double rss = sum((data.set(object)[-1]-means)^2);
+    //double ll = (*n) * (log(2*pi) + log(rss/n) + 1); // - 2*log(L(θ̂))
+    //double BIC = (*m-1)*log(*n) + ll;
+    double tmpBIC = 0;
+    double BIC = 0;
+
+    int j;
+    for(j = (*minorder+1); j <= *maxorder; j++){
+      //Want to calculate the BIC score of the new sumstat here
+
+
+
+
+
+        tempSS = SS[*n];
+        if(tmpBIC <= BIC){
+
+          *cost = tmpcost;
+          optimalorder++;
+        }else{
+          break;
+       }
+    }
+} */
+
 //Evaluate the regression quadratic cost function based on summary statistics
 void mll_reg(double *SS, int *size, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
   //SS    - Summary statistics
