@@ -29,6 +29,9 @@ cpt.ar <- function(data, penalty = "MBIC", pen.value = 0, min.order = 1, max.ord
   if(tol<0) stop("Argument 'tol' must be positive.") ##Argument shape is assessed by the command where it is to be used.
 
   #Generate the minimum summary statistic to send to C
+  if(max.order > 0.5*length(data)-1){
+    stop("The order trying to be fit is unrealistic and will lead to errors. If you wish to try an explicitly large model manually use cpt.reg")
+  }
   if(min.order==0){
       warning("The choice of AR should not realistically be used in the case. AR(1) should be set as the minimum")
       sumstat = cbind(data,rep(1,length(data)))
@@ -44,16 +47,17 @@ cpt.ar <- function(data, penalty = "MBIC", pen.value = 0, min.order = 1, max.ord
   n = length(sumstat[,1])
   MBIC = 0
   if(penalty=="MBIC"){MBIC=1}
+  #pen.value = vector(("double", n+1)
+
+  optimal.order = array(min.order, dim = n+1)
+  storage.mode(optimal.order) = 'integer'
 
   answer=list()
   answer[[7]] = 1
   on.exit(.C("FreePELT",answer[[7]]))
 
-  answer <- .C('PELT', cost_func=cost_func, sumstat=as.double(sumstat), n=as.integer(n), m=as.integer(length(sumstat[1,])), pen=as.double(pen.value), cptsout=vector("integer",n), error=as.integer(0), shape=as.double(shape), minorder=as.integer(min.order), optimalorder = as.integer(min.order), maxorder = as.integer(max.order), minseglen=as.integer(minseglen),
-  tol=as.double(tol), lastchangelike=vector("double", n+1), lastchangecpts=vector("integer", n+1), numchangecpts=vector("integer", n+1), MBIC=as.integer(MBIC))
-  if(max.order < answer$optimalorder){
-    answer$optimalorder = max.order
-  }
+  answer <- .C('PELT', cost_func=cost_func, sumstat=as.double(sumstat), n=as.integer(n), m=as.integer(length(sumstat[1,])), pen=as.double(pen.value), cptsout=vector("integer",n), error=as.integer(0), shape=as.double(shape), minorder=as.integer(min.order), optimalorder = optimal.order, maxorder = as.integer(max.order), minseglen=as.integer(minseglen),
+  tol=as.double(tol), lastchangelike=vector("double", n+1), bicvalues=vector("double", n+1), lastchangecpts=vector("integer", n+1), numchangecpts=vector("integer", n+1), MBIC=as.integer(MBIC))
   if(answer$err!=0){
       stop("C code error:",answer$err,call.=F)
   }
@@ -61,17 +65,17 @@ cpt.ar <- function(data, penalty = "MBIC", pen.value = 0, min.order = 1, max.ord
   if(class==TRUE){
     #Convert to cpt.reg object
     ans <- new("cpt.reg")
-    data.set(ans) <- design(data, answer$optimalorder)
-    cpttype(ans) <- paste0("Autoregressive structure of order ", answer$optimalorder)
+    data.set(ans) <- data
+    cpttype(ans) <- paste0("Autoregressive structure with orders", answer$optimalorder[1])
     method(ans) <- method
     distribution(ans) <- dist
     pen.type(ans) <- penalty
     pen.value(ans) <- answer$pen
-    cpts(ans) <- list(lastchangecpts=answer$lastchangecpts[1:answer$n], cpts=sort(answer$cptsout[answer$cptsout>0]), lastchangelike=answer$lastchangelike[1:answer$n], ncpts=answer$numchangecpts[1:answer$n])
+    cpts(ans) <- list(lastchangecpts=answer$lastchangecpts, cpts=sort(answer$cptsout[answer$cptsout>0]), lastchangelike=answer$lastchangelike, ncpts=answer$numchangecpts)
     if(method=="PELT") ncpts.max(ans) <- Inf
     if(param.estimates) ans = param(ans)
      return(ans)
   }else{
-    return(list(order = answer$optimalorder, lastchangecpts=answer$lastchangecpts[1:answer$n], cpts=sort(answer$cptsout[answer$cptsout>0]), lastchangelike=answer$lastchangelike[1:answer$n], ncpts=answer$numchangecpts[1:answer$n]))
+    return(list(order = answer$optimalorder, lastchangecpts=answer$lastchangecpts, cpts=sort(answer$cptsout[answer$cptsout>0]), lastchangelike=answer$lastchangelike, bics = answer$bicvalues, ncpts=answer$numchangecpts))
   }
 }

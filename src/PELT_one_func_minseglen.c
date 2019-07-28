@@ -31,7 +31,7 @@ void FreePELT(error)
   }
 }
 
-void PELT(cost_func, sumstat, n, m, pen, cptsout, error, shape, minorder, optimalorder, maxorder, minseglen, tol, lastchangelike, lastchangecpts, numchangecpts, MBIC)
+void PELT(cost_func, sumstat, n, m, pen, cptsout, error, shape, minorder, optimalorder, maxorder, minseglen, tol, lastchangelike, bicvalues, lastchangecpts, numchangecpts, MBIC)
   char **cost_func;
   double *sumstat;    /* Summary statistic for the time series, vectorised matrix of size n x m */
   int *n;			/* Length of the time series */
@@ -46,6 +46,7 @@ void PELT(cost_func, sumstat, n, m, pen, cptsout, error, shape, minorder, optima
   int *minseglen; //minimum segment length
   double *tol;    // tolerance only for cpt.reg
   double *lastchangelike; // stores likelihood up to that time using optimal changepoint locations up to that time
+	double *bicvalues; //stores Bayesian information criterion values for the mll_ar method
   int *lastchangecpts; // stores last changepoint locations
   int *numchangecpts; //stores the current number of changepoints
   int *MBIC;          // 1 if MBIC penalty, 0 if not
@@ -71,7 +72,7 @@ void meanvar_exp();
 void meanvar_gamma();
 void meanvar_poisson();
 void mll_reg();
-//void mll_ar();
+void mll_ar();
 
 
    if (strcmp(*cost_func,"var.norm")==0){
@@ -113,9 +114,9 @@ void mll_reg();
 else if (strcmp(*cost_func,"regquad")==0){
  	costfunction = &mll_reg;
 }
-//else if (strcmp(*cost_func,"ar.norm")==0){
-//	costfunction = &mll_ar; //change to ARP() when done but leave like this for now to stop errors when running
-//}
+else if (strcmp(*cost_func,"ar.norm")==0){
+	costfunction = &mll_ar; //change to ARP() when done but leave like this for now to stop errors when running
+}
 
 
 	int *checklist;
@@ -144,10 +145,9 @@ else if (strcmp(*cost_func,"regquad")==0){
   }
 
   void min_which();
-
 	if (strcmp(*cost_func,"regquad")==0){
 	  // The sumstat from R for reg is just the design matrix so we need to calculate the actual summary statistics
-	  //Summary statistics
+	  // Summary statistics
 
 	  double *Sumstats;
 	  Sumstats = (double *)calloc(np1 * size, sizeof(double));
@@ -175,8 +175,12 @@ else if (strcmp(*cost_func,"regquad")==0){
  //Evaluate cost for second minseglen
   start = 0;
 	for(j = *minseglen; j < (2 * *minseglen); j++){
-      costfunction(sumstat, &size, &np1, &p, minorder, optimalorder, maxorder, &start, &j, &segcost, tol, error, shape, MBIC);
+      costfunction(sumstat, &size, &np1, &p, minorder, optimalorder[j], maxorder, &start, &j, &segcost, tol, error, shape, MBIC);
       lastchangelike[j]=segcost;
+			if(strcmp(*cost_func,"ar.norm")==0){
+      	bicvalues[j] = optimalorder[j] * log( np1 - 1 ) + segcost;
+				np1 = *n + 1;
+			}
 
 			if(strcmp(*cost_func,"regquad")==0){
         if(*error != 0){
@@ -202,7 +206,10 @@ else if (strcmp(*cost_func,"regquad")==0){
    if ((lastchangelike[tstar]) == 0){
   		for(i=0;i<(nchecklist);i++){
 				start = checklist[i];  //last point of last segment
-				costfunction(sumstat, &size, &np1, &p, minorder, optimalorder, maxorder, &start, &tstar, &segcost, tol, error, shape, MBIC);
+				costfunction(sumstat, &size, &np1, &p, minorder, optimalorder[tstar], maxorder, &start, &tstar, &segcost, tol, error, shape, MBIC);
+				if(strcmp(*cost_func,"ar.norm")==0){
+					np1 = *n + 1;
+				}
 
 				if(strcmp(*cost_func,"regquad")==0){
 	        if(*error != 0){
@@ -216,8 +223,11 @@ else if (strcmp(*cost_func,"regquad")==0){
 				tmplike[i] = lastchangelike[start] + segcost + *pen;
       }
 
-    min_which(tmplike,&nchecklist,&minval,&minid); // updates minval and minid with min and which element 
+    min_which(tmplike,&nchecklist,&minval,&minid); // updates minval and minid with min and which element
     lastchangelike[tstar]=minval;
+		if(strcmp(*cost_func,"ar.norm")==0){
+			bicvalues[tstar] = optimalorder[tstar] * log( np1 - optimalorder[tstar] ) + lastchangelike[tstar];
+		}
     lastchangecpts[tstar]=checklist[minid];
     numchangecpts[tstar]=numchangecpts[lastchangecpts[tstar]]+1;
 
@@ -247,13 +257,18 @@ else if (strcmp(*cost_func,"regquad")==0){
         last = lastchangecpts[last];
         ncpts++;
     }
-	
+
+	if(*optimalorder != *minorder){
+		*n = *n - *optimalorder;
+		*m = *m + *optimalorder - 1;
+		*minseglen = *minseglen + *optimalorder;
+   	*pen = (*m + 2) * log( *n );
+	}
+
 	err5:  free(Sumstats);
 	err4:  free(tmpt);
 	err3:  free(tmplike);
 	err2:  free(checklist);
- // err3:  free(lastchangelike);
- // err2:  free(lastchangecpts);
   err1:  return;
 
 }

@@ -89,42 +89,101 @@ void meanvar_poisson(double *SS, int *size, int *n, int *p, int *minorder, int *
     }
 }
 
-/* void mll_ar(double *SS, int *m, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
+void mll_ar(double *SS, int *size, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
+  //SS    - Summary statistics
+  //m     - number of rows of SS
+  //n     - number of columns of SS
+  //p     - number of regressors, nb m = (p+1)*(p+2)/2
+  //start - index at start of segment
+  //end   - index at end of segment
+  //tol   - tolerance for lm
+  //error - error index
+  //shape - if>0, cost=-2loglike @ fixed shape/variance
+  //        if=0, cost=-2logLik()
+  //        if<0, cost=RSS
+  //MBIC  - 1 if MBIC penalty used, 0 if not.
 
-    int tmpcost = 0;
-    //double tmplike = 0;
-    double tempSS;
-    //tempSS = (double *)calloc(*n * *m, sizeof(double));
-    void RegQuadCost_SS();
-    void mll_reg();
+  //-- memory allocation --
+  //Summary statistics for segment
 
-    //RegQuadCost_SS(*SS, (*n-1), (*p+1), tempSS, *m);
-    // mll_reg(tempSS, *m, *n, *p, *minorder, *optimalorder, *maxorder, *start, *end, *cost, *tol, *error, *shape, *MBIC);
+  void RegQuadCost_SS();
+  void mll_reg();
+  int tmpn = *n;
+  int tmpp = *p;
+  int tmpsize = *size;
+  int resizer;
+  double tmpcost;
 
-    //double rss = sum((data.set(object)[-1]-means)^2);
-    //double ll = (*n) * (log(2*pi) + log(rss/n) + 1); // - 2*log(L(θ̂))
-    //double BIC = (*m-1)*log(*n) + ll;
-    double tmpBIC = 0;
-    double BIC = 0;
+  double *sumstat;
+  sumstat = (double *)calloc((*n-1)*(*p+1), sizeof(double));
+  int a;
+  for(a = 0; a < (*p+1)*(*n-1); a++){
+    sumstat[a] = SS[a];
+  }
 
-    int j;
-    for(j = (*minorder+1); j <= *maxorder; j++){
-      //Want to calculate the BIC score of the new sumstat here
+  int k;
+  double tmpBIC;
+  double BIC = INFINITY;
 
+  for(k = *minorder; k <= *maxorder; k++){
 
+    printf("sumstat[n] is %lf \n", sumstat[(tmpn-1)*(tmpp+1)-1]);
 
+    double *Sumstats;
+	  Sumstats = (double *)calloc(tmpn * tmpsize, sizeof(double));
 
+    int nvalue, mvalue;
+    nvalue = tmpn - 1;
+    mvalue = tmpp + 1;
 
-        tempSS = SS[*n];
-        if(tmpBIC <= BIC){
+    RegQuadCost_SS(sumstat, &nvalue, &mvalue, Sumstats, &tmpsize);
 
-          *cost = tmpcost;
-          optimalorder++;
-        }else{
-          break;
-       }
+    /*for(a = 0; a < tmpn * tmpsize; a++){
+			printf("Sumstats[%d] is %lf \n", a, Sumstats[a]);
+		}*/
+    mll_reg(Sumstats, &tmpsize, &tmpn, &tmpp, minorder, k, maxorder, &start, &end, &cost, tol, error, shape, MBIC); // this line causes the error but all the printed value of each loop are correct and everything is freed correctly
+    free(Sumstats);
+
+		tmpBIC = k * log( tmpn - 1 ) + *cost;
+
+    if(tmpBIC <= BIC){
+      tmpcost = *cost;
+      optimalorder = optimalorder + 1;
+      tmpn = tmpn - 1;
+      tmpp = tmpp + 1;
+      tmpsize = ((tmpp + 1) * (tmpp + 2)) * 0.5;
+      BIC = tmpBIC;
+
+      double tmpsumstat[((tmpp+1)*(tmpn-1)-1)];
+      int r,s;
+      for(r = 0; r < 2*(tmpn-1); r++){
+        tmpsumstat[r] = sumstat[(r+1)];
+      }
+      for(r = 2*(tmpn-1); r < 3*(tmpn-1); r++){
+        tmpsumstat[r] = sumstat[r-(2*(tmpn-1))];
+      }
+      if( (tmpp+1) > 3){
+        for(s = 3; s <= (tmpp+1); s++){
+          for(r = s*(tmpn-1); r < (s+1)*(tmpn-1); r++){
+            tmpsumstat[r] = sumstat[r-(s*(tmpn-1))+((s-1)*tmpn)];
+          }
+        }
+      }
+      resizer = (tmpp+1)*(tmpn-1);
+      sumstat = (double *)realloc(sumstat, resizer * sizeof(double));
+      int b;
+      for(b = 0; b < (tmpp+1)*(tmpn-1); b++){
+        sumstat[b] = tmpsumstat[b];
+      }
+    }else{
+      *n = tmpn + 1;
+      optimalorder = optimalorder - 1;
+      *cost = tmpcost;
+      break;
     }
-} */
+	}
+  /*printf("THIS LOOP IS FINISHED \n");*/
+}
 
 //Evaluate the regression quadratic cost function based on summary statistics
 void mll_reg(double *SS, int *size, int *n, int *p, int *minorder, int *optimalorder, int *maxorder, int *start, int *end, double *cost, double *tol, int *error, double *shape, int *MBIC){
@@ -134,7 +193,7 @@ void mll_reg(double *SS, int *size, int *n, int *p, int *minorder, int *optimalo
   //p     - number of regressors, nb m = (p+1)*(p+2)/2
   //start - index at start of segment
   //end   - index at end of segment
-  //tol   - tolerence for lm
+  //tol   - tolerance for lm
   //error - error index
   //shape - if>0, cost=-2loglike @ fixed shape/variance
   //        if=0, cost=-2logLik()

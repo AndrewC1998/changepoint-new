@@ -181,7 +181,7 @@ CptReg_PELT_Normal <- function(data, penalty.value=0, minseglen=3, shape=0,
   answer[[7]]=1
   on.exit(.C("FreePELT",answer[[7]]))
 
-  answer <- .C('PELT', cost_func=cost_func, sumstat=as.double(data), n=as.integer(n), m=as.integer(p+1), pen=as.double(penalty.value), cptsout=vector("integer",n), error=as.integer(err), shape=as.double(shape), minorder=as.integer(0), optimalorder = as.integer(0), maxorder = as.integer(0), minseglen=as.integer(minseglen), tol=as.double(tol), lastchangelike=vector("double",n+1), lastchangecpts=vector("integer",n+1), numchangecpts=vector("integer",n+1), MBIC=as.integer(MBIC))
+  answer <- .C('PELT', cost_func=cost_func, sumstat=as.double(data), n=as.integer(n), m=as.integer(p+1), pen=as.double(penalty.value), cptsout=vector("integer",n), error=as.integer(err), shape=as.double(shape), minorder=as.integer(0), optimalorder = vector("integer",n+1), maxorder = as.integer(0), minseglen=as.integer(minseglen), tol=as.double(tol), lastchangelike = vector("double",n+1), bicvalues = vector("double",n+1), lastchangecpts = vector("integer",n+1), numchangecpts = vector("integer",n+1), MBIC=as.integer(MBIC))
 
 
   if(answer$err!=0){

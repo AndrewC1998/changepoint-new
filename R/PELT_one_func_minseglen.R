@@ -14,6 +14,8 @@ PELT = function(sumstat, pen=0, cost_func = "mean.norm", shape = 1, minseglen = 
   error=0
 
   lastchangelike = array(0,dim = n+1)
+  bicvalues = array(0,dim = n+1)
+  optimal = array(0,dim = n+1)
   lastchangecpts = array(0,dim = n+1)
   numchangecpts = array(0,dim = n+1)
 
@@ -25,14 +27,15 @@ PELT = function(sumstat, pen=0, cost_func = "mean.norm", shape = 1, minseglen = 
   on.exit(.C("FreePELT",answer[[7]]))
 
   storage.mode(lastchangelike) = 'double'
+  storage.mode(bicvalues) = 'double'
+  storage.mode(optimal) = 'integer'
   storage.mode(lastchangecpts) = 'integer'
   storage.mode(numchangecpts) = 'integer'
 
   min = 0
-  optimal = 0
   max = 0
 
-  answer=.C('PELT', cost_func = cost_func, sumstat = sumstat, n = as.integer(n), m = as.integer(m), pen = as.double(pen), cptsout = cptsout, error = as.integer(error), shape = as.double(shape), minorder = as.integer(min), optimalorder = as.integer(optimal), maxorder = as.integer(max), minseglen = as.integer(minseglen), tol = as.double(tol), lastchangelike = lastchangelike, lastchangecpts = lastchangecpts, numchangecpts = numchangecpts, MBIC = as.integer(MBIC))
+  answer=.C('PELT', cost_func = cost_func, sumstat = sumstat, n = as.integer(n), m = as.integer(m), pen = as.double(pen), cptsout = cptsout, error = as.integer(error), shape = as.double(shape), minorder = as.integer(min), optimalorder = optimal, maxorder = as.integer(max), minseglen = as.integer(minseglen), tol = as.double(tol), lastchangelike = lastchangelike, bicvalues = bicvalues, lastchangecpts = lastchangecpts, numchangecpts = numchangecpts, MBIC = as.integer(MBIC))
 
 
   if(answer$error>0){
