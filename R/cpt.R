@@ -147,6 +147,42 @@ cpt.meanvar=function(data,penalty="MBIC",pen.value=0,method="AMOC",Q=5,test.stat
   }
 }
 
+
+cpt.np=function(data,penalty="MBIC",pen.value=0,method="PELT",test.stat="empirical_distribution",class=TRUE,minseglen=1, nquantiles = 10){
+    # checkData(data)
+    if(minseglen<1){minseglen=1;warning('Minimum segment length cannot be less than 1, automatically changed to be 1.')}
+    if((method=="PELT")&&(test.stat!= "empirical_distribution")){stop("Invalid test statistic, must be empirical_distribution.")}
+    
+    if(test.stat=="CUSUM"){
+        return(cpt.mean(data=data, penalty=penalty, pen.value=pen.value, method=method, test.stat='CUSUM', class=class, minseglen=minseglen))
+    }else if(test.stat=="CSS"){
+        return(cpt.var(data=data, penalty=penalty, pen.value=pen.value, method=method, test.stat='CSS', class=class, minseglen=minseglen))
+    }else{
+        if(penalty == "CROPS"){
+            if(is.numeric(pen.value)){
+                if(length(pen.value) == 2){
+                    if(pen.value[2] < pen.value[1]){
+                        pen.value = rev(pen.value)
+                    }
+                    #run range of penalties
+                    return(CROPS(data=data, method=method, pen.value=pen.value, test.stat=test.stat, class=class, minseglen=minseglen, nquantiles=nquantiles, func="nonparametric"))
+                }else{
+                    stop('The length of pen.value must be 2')
+                }
+            }else{
+                stop('For CROPS, pen.value must be supplied as a numeric vector and must be of length 2')
+            }
+        }else{
+            if(method == "PELT"){
+                return(multiple.nonparametric.ed(data,mul.method=method,penalty,pen.value,class,minseglen, nquantiles))
+            }else{
+                stop("Invalid Method, must be PELT")
+            }
+        }
+    }
+}
+
+
 checkData = function(data){
   if(!is.numeric(data)){
     stop("Only numeric data allowed")

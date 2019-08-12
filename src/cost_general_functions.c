@@ -127,8 +127,6 @@ void mll_ar(double *SS, int *size, int *n, int *p, int *minorder, int *optimalor
 
   for(k = *minorder; k <= *maxorder; k++){
 
-    printf("sumstat[n] is %lf \n", sumstat[(tmpn-1)*(tmpp+1)-1]);
-
     double *Sumstats;
 	  Sumstats = (double *)calloc(tmpn * tmpsize, sizeof(double));
 
@@ -137,10 +135,6 @@ void mll_ar(double *SS, int *size, int *n, int *p, int *minorder, int *optimalor
     mvalue = tmpp + 1;
 
     RegQuadCost_SS(sumstat, &nvalue, &mvalue, Sumstats, &tmpsize);
-
-    /*for(a = 0; a < tmpn * tmpsize; a++){
-			printf("Sumstats[%d] is %lf \n", a, Sumstats[a]);
-		}*/
     mll_reg(Sumstats, &tmpsize, &tmpn, &tmpp, minorder, k, maxorder, &start, &end, &cost, tol, error, shape, MBIC); // this line causes the error but all the printed value of each loop are correct and everything is freed correctly
     free(Sumstats);
 
@@ -182,7 +176,6 @@ void mll_ar(double *SS, int *size, int *n, int *p, int *minorder, int *optimalor
       break;
     }
 	}
-  /*printf("THIS LOOP IS FINISHED \n");*/
 }
 
 //Evaluate the regression quadratic cost function based on summary statistics
@@ -385,6 +378,76 @@ void RegQuadCost_SS(double *X, int *n, int *nc, double *SS, int *m){
   return;
 }
 
+//Nonparametric additions to the package
+
+void nonparametric_ed(double sumstatout[], int tstar, int checklist, int *nquantiles, int *n, double *cost, int *MBIC){
+
+  double Fkl;
+  double tmp_cost = 0;
+  *cost = 0;
+  int nseg = tstar - checklist;
+  int isum;
+
+  for(isum = 0; isum < *nquantiles; isum++){
+    Fkl = (sumstatout[isum])/(nseg);
+    tmp_cost = (tstar-checklist)*(Fkl*log(Fkl)+(1-Fkl)*log(1-Fkl));
+    if(!isnan(tmp_cost)){
+      *cost = *cost + tmp_cost;
+    }
+    else{
+      *cost = *cost;
+    }
+  }
+  if(*MBIC==0){
+    *cost = (-2 * (log(2 * *n - 1)) * (*cost)) / (*nquantiles);
+  }else{
+    *cost = ((-2 * (log(2 * *n - 1)) * (*cost)) / (*nquantiles)); // I think this needs added here: + log(*n);
+  }
+}
+
+/*double mll_nonparametric_ed(double sumstatout[], int tstar, int checklist, int *nquantiles, int *n){
+  double Fkl;
+  double temp_cost = 0;
+  double cost = 0;
+  int nseg, isum;
+
+  nseg = tstar - checklist;
+
+  for(isum = 0; isum < *nquantiles; isum++){
+    Fkl = (sumstatout[isum])/(nseg);
+    temp_cost = (tstar-checklist)*(Fkl*log(Fkl)+(1-Fkl)*log(1-Fkl));
+    if(!isnan(temp_cost)){
+      cost = cost + temp_cost;
+    }
+    else{
+      cost = cost;
+    }
+  }
+  cost = -2*(log(2**n-1))*cost/(*nquantiles);
+  return(cost);
+}
+
+double mll_nonparametric_ed_mbic(double sumstatout[], int tstar, int checklist, int *nquantiles, int *n){
+  double Fkl;
+  double temp_cost = 0;
+  double cost = 0;
+  int nseg, isum;
+
+  nseg = tstar - checklist;
+
+  for(isum = 0; isum < *nquantiles; isum++){
+    Fkl = (sumstatout[isum])/(nseg);
+    temp_cost = (tstar-checklist)*(Fkl*log(Fkl)+(1-Fkl)*log(1-Fkl));
+    if(!isnan(temp_cost)){
+      cost = cost + temp_cost;
+    }
+    else{
+      cost = cost;
+    }
+  }
+  cost = -2*(log(2**n-1))*cost/(*nquantiles);
+  return(cost);
+} */
 
 //Find the maximum case
 void max_which(double *array, int n, double *maxval, int *maxid){

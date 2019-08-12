@@ -1,6 +1,6 @@
 ######## Function to run PELT for a Range Of Penalty values.  ############
 
-range_of_penalties <- function(sumstat,cost = "mean.norm",PELT = T,min_pen=log(length(sumstat)/3-1),max_pen=10*log(length(sumstat)/3-1), shape = 1, minseglen) {
+range_of_penalties <- function(sumstat,cost = "mean.norm",PELT = T,min_pen=log(length(sumstat)/3-1),max_pen=10*log(length(sumstat)/3-1), shape = 1, minseglen, nquantiles = 0) {
   
   NCALC=0
   pen_interval <- c(min_pen,max_pen)
@@ -25,7 +25,11 @@ range_of_penalties <- function(sumstat,cost = "mean.norm",PELT = T,min_pen=log(l
     
     for (b in 1:length(pen_interval)) {
       
-      ans<- PELT(sumstat,pen=pen_interval[b], cost_func = cost , shape = shape, minseglen = minseglen)
+      if(cost == "empirical_distribution"){
+        ans<- NPPELT(sumstat,pen=pen_interval[b], cost_func = cost, minseglen = minseglen, nquantiles = nquantiles)
+      }else{
+        ans<- PELT(sumstat,pen=pen_interval[b], cost_func = cost , shape = shape, minseglen = minseglen)
+      }
       resultingcpts <- ans[[2]]
       new_numcpts[b] <- length(resultingcpts)
       new_cpts[b] <- list(resultingcpts[-length(resultingcpts)])

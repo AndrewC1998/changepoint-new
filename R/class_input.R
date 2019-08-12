@@ -1,4 +1,4 @@
-class_input <- function(data, cpttype, method, test.stat, penalty, pen.value, minseglen, param.estimates, out=list(), Q=NA, shape=NA){
+class_input <- function(data, cpttype, method, test.stat, penalty, pen.value, minseglen, param.estimates=FALSE, out=list(), Q=NA, shape=NA){
   if(method=="BinSeg" || penalty=="CROPS"){
     ans=new("cpt.range")
   }else{

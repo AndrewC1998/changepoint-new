@@ -8,8 +8,8 @@ cpt.ar <- function(data, penalty = "MBIC", pen.value = 0, min.order = 1, max.ord
   #value of 'penalty' & 'pen.value' checked within changepoint::penalty_decision
   if(!is.character(method) || length(method)>1)
   stop("Argument 'method' is invalid.")
-  if(method!="AMOC" && method != "PELT") ##RESTRICTION IN USE
-  stop("Invalid method, must be AMOC or PELT.")
+  if(method != "PELT") ##RESTRICTION IN USE
+  stop("Invalid method, must be PELT.")
   if(!is.character(dist) || length(dist)>1)
   stop("Argument 'dist' is invalid.")
   if(dist != "Normal"){  ##RESTRICTION IN USE
@@ -64,17 +64,17 @@ cpt.ar <- function(data, penalty = "MBIC", pen.value = 0, min.order = 1, max.ord
 
   if(class==TRUE){
     #Convert to cpt.reg object
-    ans <- new("cpt.reg")
+    ans <- new("cpt")
     data.set(ans) <- data
-    cpttype(ans) <- paste0("Autoregressive structure with orders", answer$optimalorder[1])
+    cpttype(ans) <- paste0("Autoregressive structure with order ", answer$optimalorder[1])
     method(ans) <- method
     distribution(ans) <- dist
     pen.type(ans) <- penalty
     pen.value(ans) <- answer$pen
-    cpts(ans) <- list(lastchangecpts=answer$lastchangecpts, cpts=sort(answer$cptsout[answer$cptsout>0]), lastchangelike=answer$lastchangelike, ncpts=answer$numchangecpts)
+    cpts(ans) <- list(order = answer$optimalorder, lastchangecpts=answer$lastchangecpts, cpts=sort(answer$cptsout[answer$cptsout>0]), lastchangelike=answer$lastchangelike, bics = answer$bicvalues, ncpts=answer$numchangecpts)
     if(method=="PELT") ncpts.max(ans) <- Inf
     if(param.estimates) ans = param(ans)
-     return(ans)
+    return(ans)
   }else{
     return(list(order = answer$optimalorder, lastchangecpts=answer$lastchangecpts, cpts=sort(answer$cptsout[answer$cptsout>0]), lastchangelike=answer$lastchangelike, bics = answer$bicvalues, ncpts=answer$numchangecpts))
   }

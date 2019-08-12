@@ -608,7 +608,10 @@ setMethod("param", "cpt.range", function(object,ncpts=NA,shape,...) {
         return(cbind(beta,thetajpo,thetaj))
     }
     
-    if(cpttype(object)=="mean"){
+    if(cpttype(object)=="nonparametric (empirical_distribution)"){
+        param.est = NA
+    }
+    else if(cpttype(object)=="mean"){
         param.est<-list(mean=param.mean(object,cpts))
     }
     else if(cpttype(object)=="variance"){

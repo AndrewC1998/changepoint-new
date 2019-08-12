@@ -58,7 +58,9 @@ penalty_decision = function(penalty, pen.value, n, diffparam, asymcheck, method)
     if(method != "AMOC"){
       warning('Asymptotic penalty value is not accurate for multiple changes, it should be treated the same as a manual penalty choice.')
     }
-    if(asymcheck == "mean.norm"){
+    if(asymcheck=="nonparam"){
+        stop('Asymptotic penalties are not available for nonparametric approaches, please choose an alternative penalty type')
+    }else if(asymcheck == "mean.norm"){
       alpha=pen.value
       alogn=(2*log(log(n)))^(-(1/2))
       blogn=(alogn^(-1))+(1/2)*alogn*log(log(log(n)))
