@@ -4,7 +4,7 @@ cpt.mean=function(data,penalty="MBIC",pen.value=0,method="AMOC",Q=5,test.stat="N
     minseglen=1
     warning('Minimum segment length for a change in mean is 1, automatically changed to be 1.')
   }
-  
+
   if(penalty == "CROPS"){
     # browser()
     if(is.numeric(pen.value)){
@@ -151,8 +151,7 @@ cpt.meanvar=function(data,penalty="MBIC",pen.value=0,method="AMOC",Q=5,test.stat
 cpt.np=function(data,penalty="MBIC",pen.value=0,method="PELT",test.stat="empirical_distribution",class=TRUE,minseglen=1, nquantiles = 10){
     # checkData(data)
     if(minseglen<1){minseglen=1;warning('Minimum segment length cannot be less than 1, automatically changed to be 1.')}
-    if((method=="PELT")&&(test.stat!= "empirical_distribution")){stop("Invalid test statistic, must be empirical_distribution.")}
-    
+
     if(test.stat=="CUSUM"){
         return(cpt.mean(data=data, penalty=penalty, pen.value=pen.value, method=method, test.stat='CUSUM', class=class, minseglen=minseglen))
     }else if(test.stat=="CSS"){
