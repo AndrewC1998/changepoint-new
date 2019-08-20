@@ -24,4 +24,17 @@ for(i in rn){
   NAdata[i] <- NA
 }
 NAdata[1] <- NA
-data <- list(singmeandata,mulmeandata, nochangedata, singvardata, mulvardata, mulmeanvardata, mulmeanvarexpdata, mulmeanvarpoisdata, constantdata, NAdata, shortdata, negativedata, characterdata)
+data <- list(singmeandata,mulmeandata, nochangedata, singvardata, mulvardata, mulmeanvardata, mulmeanvarexpdata, mulmeanvarpoisdata, constantdata, negativedata)
+
+method <- c("AMOC", "PELT", "BinSeg", "SegNeigh")
+
+for(i in 1:length(data)){
+  for(j in 1:length(method)){
+    if(method[j] != "PELT"){
+      expect_error(cpt.nple(data = data[[i]], method = method[j]), "Invalid Method, must be PELT")
+    }
+  }
+  expect_error(cpt.nple(data[[i]], filter.number = 11), "Unknown filter number for Daubechies wavelets with extremal phase and highest number of vanishing moments...")
+
+  expect_error(cpt.nple(data[[i]], family = "Not Supported"), "Unknown family")
+}
