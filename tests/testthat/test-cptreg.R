@@ -50,8 +50,22 @@ for(i in 1:length(otherdata)){
 
   expect_error(cpt.reg(design(otherdata[[i]],1), tol = -2), "Argument 'tol' must be positive.")
 
+  expect_warning(cpt.reg(design(otherdata[[i]],2), minseglen = 1), "minseglen is too small, set to: 4")
 
+  for(j in 1:10){
+    expect_error(cpt.reg(design(otherdata[[i]],j), minseglen = nrow(design(otherdata[[i]],j))), "Minimum segment length is too large to include a change in this data.")
+
+    expect_error(changepoint:::check_data( data = array(design(otherdata[[i]],j),dim=c(1,dim(design(otherdata[[i]],j)))), minseglen = "a"))
+  }
+
+  expect_warning(expect_error(changepoint:::check_data(design(otherdata[[i]],length(otherdata[[i]]) - 1)), "More regressors than observations."), "Due to the order of this model, there is a high risk of overfitting the data")
 }
+
+expect_error(changepoint:::check_data(data = c(1,2,3)), "Argument 'data' must be a numerical matrix.")
+
+expect_error(changepoint:::check_data(data = as.array(c(1,2,3))), "Argument 'data' must be a numerical matrix.")
+
+
 
 designdata <- list(singmeandata,mulmeandata, nochangedata, singvardata, mulvardata, mulmeanvardata, mulmeanvarexpdata, mulmeanvarpoisdata, constantdata)
 for(i in 1:length(designdata)){
