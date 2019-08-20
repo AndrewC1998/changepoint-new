@@ -61,14 +61,16 @@ t = 0 #count for number of iterations
 
 for(i in 1:length(otherdata)){
     expect_warning(cpt.var(otherdata[[i]], minseglen = 0), "Minimum segment length for a change in variance is 2, automatically changed to be 2.")
-    
+
     expect_error(cpt.var(otherdata[[i]], penalty = "CROPS"), "The length of pen.value must be 2")
-    
+
     expect_error(cpt.var(otherdata[[i]], penalty = "CROPS", pen.value = "NaN"), "For CROPS, pen.value must be supplied as a numeric vector and must be of length 2")
-    
+
     expect_error(cpt.var(otherdata[[i]], test.stat="Normal", method = "other method"), "Invalid Method, must be AMOC, PELT, BinSeg.")
-    
+
     expect_error(cpt.var(otherdata[[i]], test.stat="other test stat", method = "PELT"), "Invalid test statistic, must be Normal or CSS.")
+
+    suppressWarnings(expect_error(cpt.var(otherdata[[i]], method = "other method", test.stat = "CSS"), "Invalid Method, must be AMOC, SegNeigh or BinSeg"))
 }
 
 checkManualPenalty <- function(methodLog){
