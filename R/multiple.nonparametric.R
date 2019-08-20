@@ -53,10 +53,10 @@ segneigh.var.css=function(data,Q=5,pen=0){
     n=length(data)
     if(n<4){stop('Data must have at least 4 observations to fit a changepoint model.')}
     if(Q>((n/2)+1)){stop(paste('Q is larger than the maximum number of segments',(n/2)+1))}
-    
+
     y2=c(0,cumsum(data^2))
     oldmax=1000
-    
+
     test=NULL
     like.Q=matrix(0,ncol=n,nrow=Q)
     cp=matrix(NA,ncol=n,nrow=Q)
@@ -74,7 +74,7 @@ segneigh.var.css=function(data,Q=5,pen=0){
             cp[q,j]=which(like==max(like,na.rm=TRUE))[1]+(q-2)
         }
     }
-    
+
     cps.Q=matrix(NA,ncol=Q,nrow=Q)
     for(q in 2:Q){
         cps.Q[q,1]=cp[q,n]
@@ -82,7 +82,7 @@ segneigh.var.css=function(data,Q=5,pen=0){
             cps.Q[q,(i+1)]=cp[(q-i),cps.Q[q,i]]
         }
     }
-    
+
     op.cps=0
     flag=0
     for(q in 2:Q){
@@ -100,7 +100,7 @@ segneigh.var.css=function(data,Q=5,pen=0){
     if(op.cps==(Q-1)){warning('The number of segments identified is Q, it is advised to increase Q to make sure changepoints have not been missed.')}
     if(op.cps==0){cpts=n}
     else{cpts=c(sort(cps.Q[op.cps+1,][cps.Q[op.cps+1,]>0]),n)}
-    
+
     return(list(cps=t(apply(cps.Q,1,sort,na.last=TRUE)),cpts=cpts,op.cpts=op.cps,pen=pen,like=criterion[op.cps+1],like.Q=like.Q[,n]))
 }
 
@@ -108,14 +108,14 @@ segneigh.var.css=function(data,Q=5,pen=0){
 
 binseg.var.css=function(data,Q=5,pen=0,minseglen=2){
     n=length(data)
-    if(n<4){stop('Data must have atleast 4 observations to fit a changepoint model.')}
+    if(n<4){stop('Data must have at least 4 observations to fit a changepoint model.')}
     if(Q>((n/2)+1)){stop(paste('Q is larger than the maximum number of segments',(n/2)+1))}
-    
+
     y2=c(0,cumsum(data^2))
     tau=c(0,n)
     cpt=matrix(0,nrow=2,ncol=Q)
     oldmax=Inf
-    
+
     for(q in 1:Q){
         lambda=rep(0,n-1)
         i=1
@@ -146,10 +146,10 @@ binseg.var.css=function(data,Q=5,pen=0,minseglen=2){
         }
     }
     if(op.cps==Q){warning('The number of changepoints identified is Q, it is advised to increase Q to make sure changepoints have not been missed.')}
-    
+
     if(op.cps==0){cpts=n}
     else{cpts=c(sort(cpt[1,1:op.cps]),n)}
-    
+
     return(list(cps=cpt,cpts=cpts,op.cpts=op.cps,pen=pen))
 }
 
@@ -173,7 +173,7 @@ multiple.var.css=function(data,mul.method="BinSeg",penalty="MBIC",pen.value=0,Q=
         n=ncol(data)
     }
     if(n<(2*minseglen)){stop('Minimum segment legnth is too large to include a change in this data')}
-    
+
     pen.value = penalty_decision(penalty, pen.value, n, diffparam, asymcheck = costfunc, method=mul.method)
     if(is.null(dim(data))==TRUE){
         # single dataset
@@ -232,12 +232,12 @@ multiple.var.css=function(data,mul.method="BinSeg",penalty="MBIC",pen.value=0,Q=
 
 segneigh.mean.cusum=function(data,Q=5,pen=0){
     n=length(data)
-    if(n<2){stop('Data must have atleast 2 observations to fit a changepoint model.')}
+    if(n<2){stop('Data must have at least 2 observations to fit a changepoint model.')}
     if(Q>((n/2)+1)){stop(paste('Q is larger than the maximum number of segments',(n/2)+1))}
-    
+
     y=c(0,cumsum(data))
     oldmax=1000
-    
+
     test=NULL
     like.Q=matrix(0,ncol=n,nrow=Q)
     cp=matrix(NA,ncol=n,nrow=Q)
@@ -255,7 +255,7 @@ segneigh.mean.cusum=function(data,Q=5,pen=0){
             cp[q,j]=which(like==max(like,na.rm=TRUE))[1]+(q-2)
         }
     }
-    
+
     cps.Q=matrix(NA,ncol=Q,nrow=Q)
     for(q in 2:Q){
         cps.Q[q,1]=cp[q,n]
@@ -263,7 +263,7 @@ segneigh.mean.cusum=function(data,Q=5,pen=0){
             cps.Q[q,(i+1)]=cp[(q-i),cps.Q[q,i]]
         }
     }
-    
+
     op.cps=0
     flag=0
     for(q in 2:Q){
@@ -278,27 +278,27 @@ segneigh.mean.cusum=function(data,Q=5,pen=0){
         }
         op.cps=op.cps+1
     }
-    
+
     if(op.cps==(Q-1)){warning('The number of segments identified is Q, it is advised to increase Q to make sure changepoints have not been missed.')}
-    
+
     if(op.cps==0){cpts=n}
     else{cpts=c(sort(cps.Q[op.cps+1,][cps.Q[op.cps+1,]>0]),n)}
-    
+
     return(list(cps=t(apply(cps.Q,1,sort,na.last=TRUE)),cpts=cpts,op.cpts=op.cps,pen=pen,like=criterion[op.cps+1],like.Q=like.Q[,n]))
 }
 
 
 binseg.mean.cusum=function(data,Q=5,pen=0,minseglen=1){
     n=length(data)
-    if(n<2){stop('Data must have atleast 2 observations to fit a changepoint model.')}
-    
+    if(n<2){stop('Data must have at least 2 observations to fit a changepoint model.')}
+
     if(Q>((n/2)+1)){stop(paste('Q is larger than the maximum number of segments',(n/2)+1))}
-    
+
     y=c(0,cumsum(data))
     tau=c(0,n)
     cpt=matrix(0,nrow=2,ncol=Q)
     oldmax=Inf
-    
+
     for(q in 1:Q){
         lambda=rep(0,n-1)
         i=1
@@ -308,9 +308,9 @@ binseg.mean.cusum=function(data,Q=5,pen=0,minseglen=1){
             #         if(j==end){#end-sinseglen+1
             #           st=end+1;i=i+1;end=tau[i+1]
             #           # j=j+minseglen
-            
-            
-            
+
+
+
             if(j==end){
                 st=end+1;i=i+1;end=tau[i+1]
             }else{
@@ -336,16 +336,16 @@ binseg.mean.cusum=function(data,Q=5,pen=0,minseglen=1){
         }
     }
     if(op.cps==Q){warning('The number of changepoints identified is Q, it is advised to increase Q to make sure changepoints have not been missed.')}
-    
+
     if(op.cps==0){cpts=n}
     else{cpts=c(sort(cpt[1,1:op.cps]),n)}
-    
+
     return(list(cps=cpt,cpts=cpts,op.cpts=op.cps,pen=pen))
 }
 
 
 multiple.mean.cusum=function(data,mul.method="BinSeg",penalty="Asymptotic",pen.value=0.05,Q=5,class=TRUE,param.estimates=TRUE,minseglen){
-    
+
     if(mul.method=="PELT"){ stop("CUSUM does not satisfy the assumptions of PELT, use SegNeigh or BinSeg instead.") }
     else if(!((mul.method=="BinSeg")||(mul.method=="SegNeigh"))){
         stop("Multiple Method is not recognised")
@@ -364,7 +364,7 @@ multiple.mean.cusum=function(data,mul.method="BinSeg",penalty="Asymptotic",pen.v
         n=ncol(data)
     }
     if(n<(2*minseglen)){stop('Minimum segment legnth is too large to include a change in this data')}
-    
+
     pen.value = penalty_decision(penalty, pen.value, n, diffparam, asymcheck = costfunc, method=mul.method)
     if(is.null(dim(data))==TRUE){
         # single dataset

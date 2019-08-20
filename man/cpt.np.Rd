@@ -4,7 +4,7 @@
 \usage{
 cpt.np(data, penalty = "MBIC", pen.value = 0, method = "PELT",
   test.stat = "empirical_distribution", class = TRUE, minseglen = 1,
-  nquantiles = 10)
+  nquantiles = 10, Q = 5)
 }
 \arguments{
 \item{data}{A vector, ts object or matrix containing the data within which you wish to find a changepoint.  If the data is a matrix, each row is considered as a separate dataset.}
@@ -22,6 +22,8 @@ cpt.np(data, penalty = "MBIC", pen.value = 0, method = "PELT",
 \item{minseglen}{Positive integer giving the minimum segment length (number of observations between changes), default is the minimum allowed by theory.}
 
 \item{nquantiles}{The number of quantiles to calculate when test.stat = "empirical_distribution".}
+
+\item{q}{Maximum number of changepoints to search for when using "CUSUM" and "CSS".}
 }
 \value{
 If \code{class=TRUE} then an object of S4 class "cpt" is returned.  The slot \code{cpts} contains the changepoints that are returned.  For \code{class=FALSE} the structure is as follows.

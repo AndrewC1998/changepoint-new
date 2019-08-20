@@ -36,5 +36,7 @@ for(i in 1:length(data)){
     suppressWarnings(expect_error(cpt.np(data[[i]], test.stat = "CUSUM", method = method[j], penalty = "Asymptotic"), "Asymptotic penalty values must be > 0 and <= 1"))
 
     suppressWarnings(expect_error(cpt.np(data[[i]], test.stat = "CUSUM", method = method[j], penalty = "Asymptotic", pen.value = 0.01), "Asymptotic penalties have not been implemented yet for CUSUM"))
+
+
   }
 }
