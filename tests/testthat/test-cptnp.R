@@ -46,5 +46,10 @@ for(i in 1:length(data)){
     suppressWarnings(expect_error(cpt.np(data[[i]], test.stat = "CSS", method = method2[j]), "MBIC penalty is not valid for nonparametric test statistics."))
 
     expect_warning(cpt.np(data[[i]], test.stat = "CSS", method = method2[j], penalty = "Asymptotic", pen.value = 0.01), "Asymptotic penalty value is not accurate for multiple changes, it should be treated the same as a manual penalty choice.")
+
+    expect_warning(cpt.np(data[[i]], test.stat = "CSS", method = method2[j], penalty = "Manual"), "Traditional penalty values are not appropriate for the CSS test statistic")
   }
+  expect_error(cpt.np(data[[i]], test.stat = "empirical_distribution", penalty = "CROPS"), "The length of pen.value must be 2")
+
+  expect_error(cpt.np(data[[i]], test.stat = "empirical_distribution", penalty = "CROPS", pen.value = "NaN"), "For CROPS, pen.value must be supplied as a numeric vector and must be of length 2")
 }
