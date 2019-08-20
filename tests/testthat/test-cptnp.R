@@ -27,6 +27,8 @@ NAdata[1] <- NA
 data <- list(singmeandata,mulmeandata, nochangedata, singvardata, mulvardata, mulmeanvardata, mulmeanvarexpdata, mulmeanvarpoisdata, constantdata, negativedata)
 
 method <- c("AMOC", "BinSeg", "SegNeigh")
+method2 <- c("BinSeg", "BinSeg", "SegNeigh")
+
 for(i in 1:length(data)){
   for(j in 1:length(method)){
     suppressWarnings(expect_error(cpt.np(data[[i]], test.stat = "CUSUM"), "Invalid Method, must be AMOC, SegNeigh or BinSeg"))
@@ -38,5 +40,11 @@ for(i in 1:length(data)){
     suppressWarnings(expect_error(cpt.np(data[[i]], test.stat = "CUSUM", method = method[j], penalty = "Asymptotic", pen.value = 0.01), "Asymptotic penalties have not been implemented yet for CUSUM"))
 
     expect_warning(cpt.np(data[[i]], test.stat = "CUSUM", method = method[j], penalty = "Manual"), "Traditional penalty values are not appropriate for the CUSUM test statistic")
+
+    suppressWarnings(expect_error(cpt.np(data[[i]], test.stat = "CSS"), "CSS does not satisfy the assumptions of PELT, use SegNeigh or BinSeg instead."))
+
+    suppressWarnings(expect_error(cpt.np(data[[i]], test.stat = "CSS", method = method2[j]), "MBIC penalty is not valid for nonparametric test statistics."))
+
+    expect_warning(cpt.np(data[[i]], test.stat = "CSS", method = method2[j], penalty = "Asymptotic", pen.value = 0.01), "Asymptotic penalty value is not accurate for multiple changes, it should be treated the same as a manual penalty choice.")
   }
 }
