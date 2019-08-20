@@ -24,4 +24,36 @@ for(i in rn){
   NAdata[i] <- NA
 }
 NAdata[1] <- NA
-data <- list(singmeandata,mulmeandata, nochangedata, singvardata, mulvardata, mulmeanvardata, mulmeanvarexpdata, mulmeanvarpoisdata, constantdata, NAdata, shortdata, negativedata, characterdata)
+data <- list(singmeandata,mulmeandata, nochangedata, singvardata, mulvardata, mulmeanvardata, mulmeanvarexpdata, mulmeanvarpoisdata, negativedata)
+
+expect_error(cpt.ar(NAdata), "data has missing values, this function cannot handle missing values")
+
+expect_error(cpt.ar(characterdata), "data must be a numeric vector")
+
+for(i in 1:length(data)){
+  expect_error(cpt.ar(data[[i]], penalty = 1), "Argument 'penalty' is invalid.")
+
+  expect_error(cpt.ar(data[[i]], method = 1), "Argument 'method' is invalid.")
+
+  expect_error(cpt.ar(data[[i]], method = "other method"), "Invalid method, must be PELT.")
+
+  expect_error(cpt.ar(data[[i]], dist = 1), "Argument 'dist' is invalid.")
+
+  #expect_warning(cpt.ar(data[[i]], dist = "Exponential", class = FALSE), "dist = Exponential is not supported. Converted to dist='Normal'")
+
+  expect_error(cpt.ar(data[[i]], class = 1), "Argument 'class' is invalid.")
+
+  expect_error(cpt.ar(data[[i]], param.estimates = 1), "Argument 'param.estimates' is invalid.")
+
+  expect_error(cpt.ar(data[[i]], minseglen = "character"), "Argument 'minseglen' is invalid.")
+
+  expect_error(cpt.ar(data[[i]], minseglen = -2), "Argument 'minseglen' must be positive integer.")
+
+  expect_error(cpt.ar(data[[i]], tol = "character"), "Argument 'tol' is invalid.")
+
+  expect_error(cpt.ar(data[[i]], tol = -2), "Argument 'tol' must be positive.")
+
+  expect_error(cpt.ar(data[[i]], min.order = 0), "The choice of AR should not realistically be used in the case. AR with order 1 should be set as the minimum")
+
+  expect_error(cpt.ar(data[[i]], max.order = length(data[[i]])), "The order trying to be fit is unrealistic and will lead to errors. If you wish to try an explicitly large model manually use cpt.reg")
+}

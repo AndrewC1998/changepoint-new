@@ -4,7 +4,7 @@ cpt.ar <- function(data, penalty = "MBIC", pen.value = 0, min.order = 1, max.ord
   if(any(!complete.cases(data))){stop("data has missing values, this function cannot handle missing values")}
   if(any(!is.numeric(data))){stop("data must be a numeric vector")}
   if(!is.character(penalty) || length(penalty)>1)
-  stop("Argument 'penelty' is invalid.")
+  stop("Argument 'penalty' is invalid.")
   #value of 'penalty' & 'pen.value' checked within changepoint::penalty_decision
   if(!is.character(method) || length(method)>1)
   stop("Argument 'method' is invalid.")
@@ -33,8 +33,7 @@ cpt.ar <- function(data, penalty = "MBIC", pen.value = 0, min.order = 1, max.ord
     stop("The order trying to be fit is unrealistic and will lead to errors. If you wish to try an explicitly large model manually use cpt.reg")
   }
   if(min.order==0){
-      warning("The choice of AR should not realistically be used in the case. AR(1) should be set as the minimum")
-      sumstat = cbind(data,rep(1,length(data)))
+      stop("The choice of AR should not realistically be used in the case. AR with order 1 should be set as the minimum")
   }else{
       sumstat = design(data,min.order)
   }
