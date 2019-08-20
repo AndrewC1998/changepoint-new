@@ -25,6 +25,33 @@ for(i in rn){
 }
 NAdata[1] <- NA
 data <- list(singmeandata,mulmeandata, nochangedata, singvardata, mulvardata, mulmeanvardata, mulmeanvarexpdata, mulmeanvarpoisdata, constantdata, NAdata, shortdata, negativedata, characterdata)
+otherdata <- list(singmeandata,mulmeandata, nochangedata, singvardata, mulvardata, mulmeanvardata, mulmeanvarexpdata, mulmeanvarpoisdata, constantdata)
+
+for(i in 1:length(otherdata)){
+  expect_error(cpt.reg(design(otherdata[[i]],1), penalty = 1), "Argument 'penalty' is invalid.")
+
+  expect_error(cpt.reg(design(otherdata[[i]],1), method = 1), "Argument 'method' is invalid.")
+
+  expect_error(cpt.reg(design(otherdata[[i]],1), method = "other method"), "Invalid method, must be AMOC or PELT.")
+
+  expect_error(cpt.reg(design(otherdata[[i]],1), dist = 1), "Argument 'dist' is invalid.")
+
+  expect_warning(cpt.reg(design(otherdata[[i]],1), dist = "Exponential"), "dist = Exponential is not supported. Converted to dist='Normal'")
+
+  expect_error(cpt.reg(design(otherdata[[i]],1), class = 1), "Argument 'class' is invalid.")
+
+  expect_error(cpt.reg(design(otherdata[[i]],1), param.estimates = 1), "Argument 'param.estimates' is invalid.")
+
+  expect_error(cpt.reg(design(otherdata[[i]],1), minseglen = "character"), "Argument 'minseglen' is invalid.")
+
+  expect_error(cpt.reg(design(otherdata[[i]],1), minseglen = -2), "Argument 'minseglen' must be positive integer.")
+
+  expect_error(cpt.reg(design(otherdata[[i]],1), tol = "character"), "Argument 'tol' is invalid.")
+
+  expect_error(cpt.reg(design(otherdata[[i]],1), tol = -2), "Argument 'tol' must be positive.")
+
+
+}
 
 designdata <- list(singmeandata,mulmeandata, nochangedata, singvardata, mulvardata, mulmeanvardata, mulmeanvarexpdata, mulmeanvarpoisdata, constantdata)
 for(i in 1:length(designdata)){
@@ -46,5 +73,3 @@ for(i in 1:length(data)){
   }
  }
 }
-
-
