@@ -30,6 +30,9 @@ method <- c("AMOC", "BinSeg", "SegNeigh")
 method2 <- c("BinSeg", "BinSeg", "SegNeigh")
 
 for(i in 1:length(data)){
+
+  expect_warning(cpt.np(data[[i]], minseglen = 0), 'Minimum segment length cannot be less than 1, automatically changed to be 1.')
+
   for(j in 1:length(method)){
     suppressWarnings(expect_error(cpt.np(data[[i]], test.stat = "CUSUM"), "Invalid Method, must be AMOC, SegNeigh or BinSeg"))
 
@@ -52,4 +55,6 @@ for(i in 1:length(data)){
   expect_error(cpt.np(data[[i]], test.stat = "empirical_distribution", penalty = "CROPS"), "The length of pen.value must be 2")
 
   expect_error(cpt.np(data[[i]], test.stat = "empirical_distribution", penalty = "CROPS", pen.value = "NaN"), "For CROPS, pen.value must be supplied as a numeric vector and must be of length 2")
+
+  expect_error(cpt.np(data[[i]], test.stat = "empirical_distribution", penalty = "Manual", method = "BinSeg"), "Invalid Method, must be PELT")
 }
