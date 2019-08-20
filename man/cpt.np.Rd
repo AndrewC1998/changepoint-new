@@ -23,7 +23,7 @@ cpt.np(data, penalty = "MBIC", pen.value = 0, method = "PELT",
 
 \item{nquantiles}{The number of quantiles to calculate when test.stat = "empirical_distribution".}
 
-\item{q}{Maximum number of changepoints to search for when using "CUSUM" and "CSS".}
+\item{Q}{Maximum number of changepoints to search for when using "CUSUM" and "CSS".}
 }
 \value{
 If \code{class=TRUE} then an object of S4 class "cpt" is returned.  The slot \code{cpts} contains the changepoints that are returned.  For \code{class=FALSE} the structure is as follows.
