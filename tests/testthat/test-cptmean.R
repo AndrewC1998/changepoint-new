@@ -30,6 +30,8 @@ for(i in rn){
 
 data <- list(singmeandata,mulmeandata, nochangedata, constantdata, NAdata, shortdata, negativedata, characterdata)
 
+otherdata <- list(singmeandata,mulmeandata, nochangedata, constantdata, negativedata)
+
 # meandata <- list(singmeandata, mulmeandata, nochangedata)
 # vardata <-  list(singvardata, mulvardata, nochangedata)
 # meanvardata <-  list(singmeanvardata, mulmeanvardata, nochangedata)
@@ -56,6 +58,19 @@ minseglen <- c(-1, 10, 20000)
 cropspenval = list(c(2,2.5), c(3,1), c(5,5,6), c("a", "b"), 5, "a")
 
 t = 0 #count for number of iterations
+
+
+for(i in 1:length(otherdata)){
+    expect_warning(cpt.mean(otherdata[[i]], minseglen = 0), 'Minimum segment length for a change in mean is 1, automatically changed to be 1.')
+    
+    expect_error(cpt.mean(otherdata[[i]], penalty = "CROPS"), "The length of pen.value must be 2")
+    
+    expect_error(cpt.mean(otherdata[[i]], penalty = "CROPS", pen.value = "NaN"), "For CROPS, pen.value must be supplied as a numeric vector and must be of length 2")
+    
+    expect_error(cpt.mean(otherdata[[i]], test.stat="Normal", method = "other method"), "Invalid Method, must be AMOC, PELT or BinSeg.")
+    
+    expect_error(cpt.mean(otherdata[[i]], test.stat="other test stat", method = "PELT"), "Invalid test statistic, must be Normal or CUSUM.")
+}
 
 checkManualPenalty <- function(methodLog){
   aQv <- Qv
