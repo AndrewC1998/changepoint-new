@@ -242,10 +242,10 @@ else if (strcmp(*cost_func,"ar.norm")==0){
 			nchecklist = nchecktmp;
 		}
 		//Add new cpt to checklist
-		checklist[nchecklist] = tstar - (*minseglen-1); // atleast 1 obs per seg
+		checklist[nchecklist] = tstar - (*minseglen-1); // at least 1 obs per seg
 		nchecklist++;
 
-    //  nchecklist=nchecktmp;
+    //  nchecklist = nchecktmp;
 
   } // end taustar
 
