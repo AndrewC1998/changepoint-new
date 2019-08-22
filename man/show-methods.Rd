@@ -4,6 +4,7 @@
 \alias{show,ANY-method}
 \alias{show,cpt-method}
 \alias{show,cpt.reg-method}
+\alias{show,cpt.ar-method}
 \title{ ~~ Methods for Function print in Package `base' ~~}
 \description{
  ~~ Methods for function \code{show} in Package `base' ~~

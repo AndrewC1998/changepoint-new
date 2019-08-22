@@ -5,6 +5,7 @@
 \alias{summary,cpt-method}
 \alias{summary,cpt.range-method}
 \alias{summary,cpt.reg-method}
+\alias{summary,cpt.ar-method}
 \title{ ~~ Methods for Function summary in Package `base' ~~}
 \description{
  ~~ Methods for function \code{summary} in Package `base' ~~

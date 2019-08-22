@@ -63,16 +63,17 @@ cpt.ar <- function(data, penalty = "MBIC", pen.value = 0, min.order = 1, max.ord
 
   if(class==TRUE){
     #Convert to cpt.reg object
-    ans <- new("cpt")
-    data.set(ans) <- data
-    cpttype(ans) <- paste0("Autoregressive structure with order ", answer$optimalorder[1])
+    ans <- new("cpt.ar")
+    data.set(ans) <- design(data, min.order)
+    orders(ans) <- answer$optimalorder
+    cpttype(ans) <- "regression"
     method(ans) <- method
-    distribution(ans) <- dist
+    test.stat(ans) <- dist
     pen.type(ans) <- penalty
     pen.value(ans) <- answer$pen
-    cpts(ans) <- list(order = answer$optimalorder, lastchangecpts=answer$lastchangecpts, cpts=sort(answer$cptsout[answer$cptsout>0]), lastchangelike=answer$lastchangelike, bics = answer$bicvalues, ncpts=answer$numchangecpts)
+    #cpts(ans) <- list(order = answer$optimalorder, lastchangecpts=answer$lastchangecpts, cpts=sort(answer$cptsout[answer$cptsout>0]), lastchangelike=answer$lastchangelike, bics = answer$bicvalues, ncpts=answer$numchangecpts)
     if(method=="PELT") ncpts.max(ans) <- Inf
-    if(param.estimates) ans = param(ans)
+    #if(param.estimates) ans = param(ans)
     return(ans)
   }else{
     return(list(order = answer$optimalorder, lastchangecpts=answer$lastchangecpts, cpts=sort(answer$cptsout[answer$cptsout>0]), lastchangelike=answer$lastchangelike, bics = answer$bicvalues, ncpts=answer$numchangecpts))
