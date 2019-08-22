@@ -71,6 +71,8 @@ for(i in 1:length(otherdata)){
     expect_error(cpt.var(otherdata[[i]], test.stat="other test stat", method = "PELT"), "Invalid test statistic, must be Normal or CSS.")
 
     suppressWarnings(expect_error(cpt.var(otherdata[[i]], method = "other method", test.stat = "CSS"), "Invalid Method, must be AMOC, SegNeigh or BinSeg"))
+    
+    expect_warning(cpt.var(otherdata[[i]], test.stat="NPLE"),"Only method currently available is PELT. The method has been automatically changed.")
 }
 
 checkManualPenalty <- function(methodLog){

@@ -53,7 +53,7 @@ Rebecca Killick
 
 
 \seealso{
-\code{\link{cpt.np}},\code{\link{cpt.nple}},\code{\link{plot-methods}},\code{\linkS4class{cpt}}
+\code{\link{cpt.np}},\code{\link{cpt.var}},\code{\link{nple}},\code{\link{plot-methods}},\code{\linkS4class{cpt}}
 }
 \examples{
 #This function should only be used by developers, see its use in cpt.np.

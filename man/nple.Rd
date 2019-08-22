@@ -1,5 +1,5 @@
-\name{cpt.nple}
-\alias{cpt.nple}
+\name{nple}
+\alias{nple}
 \title{
 Detects changes in local stationary wavelet autocorelation.
 }
@@ -7,7 +7,7 @@ Detects changes in local stationary wavelet autocorelation.
 Plots the optimal positioning of changepoints for data using the user specified method. 
 }
 \usage{
-cpt.nple(data, penalty = "Manual", pen.value = 6 * log(length(data) - crop), 
+nple(data, penalty = "Manual", pen.value = 6 * log(length(data) - crop), 
          method = "PELT", class = TRUE, minseglen = 30, nquantiles = 10, 
         crop = 16, family = "DaubExPhase", filter.number = 10, binwidth = 1)
 }
@@ -77,7 +77,7 @@ Andrew Connell, Rebecca Killick
 }
 \examples{
  x <- c(rnorm(100,50,1), rnorm(100,50,3))
- cpt.nple(x)
+ changepoint:::nple(x)
 }
 
 \keyword{methods}

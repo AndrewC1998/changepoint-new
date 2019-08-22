@@ -1,3 +1,9 @@
+Version 2.4
+===========
+* Adds new cpt.ar functionality which allows for selection of different AR(p) models for each segments.
+* New NPLE test statistic in cpt.var which allows for changepoint detection in second order structures.
+* Combines the non-parametric changepoint function cpt.np to the main changepoint package. This has removed the need for changepoint.np as this functionality has been incorporated here.
+
 Version 2.3.1
 ============
 * Ported cpt.reg from EnvCpt to changepoint.
@@ -11,8 +17,8 @@ Version 2.3
 * Fixed bug that meant logLik(.) was erroring when used on output from cpt.mean(.).
 * Added "type=" functionality to the "diagnostic=TRUE" graphs.  Thanks go to github user hoxo_m for providing the code and tests for this.
 * Updated PELT pruning in the C code thanks to Alex Fisch for spotting that the pruning for minimum segment length >2 was not implemented to provide an exact solution.
-* Corrected type functionality in diagnostic=TRUE graphs. Thanks to Andrew Conell. 
-* Removed the vdiffr test at this juncture due to an existing issue with the vdiffr package and the errors this caused on TRAVIS CI and future changes. 
+* Corrected type functionality in diagnostic=TRUE graphs. Thanks to Andrew Conell.
+* Removed the vdiffr test at this juncture due to an existing issue with the vdiffr package and the errors this caused on TRAVIS CI and future changes.
 
 Version 2.2.4
 =============

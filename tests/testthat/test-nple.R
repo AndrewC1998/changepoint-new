@@ -1,4 +1,4 @@
-context("cpt.nple tests")
+context("nple tests")
 
 # testing functions, aim to get 100% test coverage on exported code
 # testing for cpt.reg function
@@ -31,10 +31,10 @@ method <- c("AMOC", "PELT", "BinSeg", "SegNeigh")
 for(i in 1:length(data)){
   for(j in 1:length(method)){
     if(method[j] != "PELT"){
-      expect_error(cpt.nple(data = data[[i]], method = method[j]), "Invalid Method, must be PELT")
+        expect_error(changepoint:::nple(data = data[[i]], method = method[j]), "Invalid Method, must be PELT")
     }
   }
-  expect_error(cpt.nple(data[[i]], filter.number = 11), "Unknown filter number for Daubechies wavelets with extremal phase and highest number of vanishing moments...")
+  expect_error(changepoint:::nple(data[[i]], filter.number = 11), "Unknown filter number for Daubechies wavelets with extremal phase and highest number of vanishing moments...")
 
-  expect_error(cpt.nple(data[[i]], family = "Not Supported"), "Unknown family")
+  expect_error(changepoint:::nple(data[[i]], family = "Not Supported"), "Unknown family")
 }
