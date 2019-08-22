@@ -102,7 +102,6 @@ Andrew Connell
 }
 \examples{
 showClass("cpt.ar") # shows the structure of the cpt class
-
 x=new("cpt.ar") # creates a new object with the cpt class defaults
 cpts(x) # retrieves the cpts slot from x
 cpts(x)<-c(10,50,100) # replaces the cpts slot from x with c(10,50,100)
