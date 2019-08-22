@@ -1,5 +1,5 @@
 #Detect changes in variance using a localised estimate of the variance from LSW model
-cpt.nple <- function(data, penalty = "Manual", pen.value = 6 * log(length(data) - crop), method = "PELT", class = TRUE, minseglen = 30, nquantiles = 10, crop = 16, family = "DaubExPhase", filter.number = 10, binwidth = 1){
+nple <- function(data, penalty = "Manual", pen.value = 6 * log(length(data) - crop), method = "PELT", class = TRUE, minseglen = 30, nquantiles = 10, crop = 16, family = "DaubExPhase", filter.number = 10, binwidth = 1){
 
     n = length(data)
 

@@ -7,8 +7,10 @@ Identifying Changes in Variance
 Calculates the optimal positioning and (potentially) number of changepoints for data using the user specified method.
 }
 \usage{
-cpt.var(data,penalty="MBIC",pen.value=0,know.mean=FALSE,mu=NA,method="AMOC",Q=5,
-test.stat="Normal",class=TRUE,param.estimates=TRUE,minseglen=2)
+cpt.var(data, penalty = "MBIC", pen.value = 0, know.mean = FALSE, 
+        mu = NA, method = "AMOC", Q = 5, test.stat = "Normal", class = TRUE, 
+        param.estimates = TRUE, minseglen = 2, nquantiles = 10, crop = 16, 
+        family = "DaubExPhase", filter.number = 10, binwidth = 1)
 }
 \arguments{
   \item{data}{
@@ -33,7 +35,7 @@ test.stat="Normal",class=TRUE,param.estimates=TRUE,minseglen=2)
 	The maximum number of changepoints to search for using the "BinSeg" method.
 }
   \item{test.stat}{
-	The assumed test statistic / distribution of the data.  Currently only "Normal" is supported.
+	The assumed test statistic / distribution of the data.  Currently "Normal" and "NPLE" are supported. Read the separate nple.Rd file to understand how the "NPLE" is implemented.
 }
   \item{class}{
 	Logical.  If TRUE then an object of class \code{cpt} is returned.
@@ -43,6 +45,21 @@ test.stat="Normal",class=TRUE,param.estimates=TRUE,minseglen=2)
 }
   \item{minseglen}{
   Positive integer giving the minimum segment length (no. of observations between changes), default is the minimum allowed by theory.
+  }
+  \item{nquantiles}{
+  The number of quantiles to calculate.
+  }
+  \item{crop}{
+  The amount of data pruned.
+  }
+  \item{family}{
+   Option passed through to wavethresh functions. The option allows selection from which of a range of families the wavelet will come from. Please read wavethresh documentation for more details.
+  }
+  \item{filter.number}{
+   Option passed through to wavethresh functions. Allows user to choose a filter. Please read wavethresh documentation for more details.
+  }
+  \item{binwidth}{
+   If the periodogram smoothing is "RM" then this is the number of consecutive observations used in the running mean smooth. Currently the only periodogram smoothing supported is "RM".
   }
 }
 \details{

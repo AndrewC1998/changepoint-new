@@ -44,10 +44,16 @@ cpt.mean=function(data,penalty="MBIC",pen.value=0,method="AMOC",Q=5,test.stat="N
   }
 }
 
-cpt.var=function(data,penalty="MBIC",pen.value=0,know.mean=FALSE, mu=NA,method="AMOC",Q=5,test.stat="Normal",class=TRUE,param.estimates=TRUE,minseglen=2){
+cpt.var=function(data,penalty="MBIC",pen.value=0,know.mean=FALSE, mu=NA,method="AMOC",Q=5,test.stat="Normal",class=TRUE,param.estimates=TRUE,minseglen=2,nquantiles = 10, crop = 16, family = "DaubExPhase", filter.number = 10, binwidth = 1){
   checkData(data)
   if(minseglen<2){minseglen=2;warning('Minimum segment length for a change in variance is 2, automatically changed to be 2.')}
-
+  if(test.stat=="NPLE"){
+    if(method != "PELT"){
+      warning("Only method currently available is PELT. The method has been automatically changed.")
+      method = "PELT"
+    }
+    return(nple(data = data, penalty = penalty, pen.value = pen.value, method = method, class = class, minseglen = minseglen, nquantiles = nquantiles, crop = crop, family = family, filter.number = filter.number, binwidth = binwidth))
+  }
   if(penalty == "CROPS"){
     # browser()
     if(is.numeric(pen.value)){
