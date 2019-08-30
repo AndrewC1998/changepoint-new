@@ -162,7 +162,7 @@ else if (strcmp(*cost_func,"ar.norm")==0){
 	}
 
   //Initialise
-  for(j = 0; j < *minseglen; j++){
+  for(j = 0; j <= *minseglen; j++){
     if(j==0){
       lastchangelike[j] = -*pen;
     }else{
@@ -174,7 +174,7 @@ else if (strcmp(*cost_func,"ar.norm")==0){
 
  //Evaluate cost for second minseglen
   start = 0;
-	for(j = *minseglen; j < (2 * *minseglen); j++){
+	for(j = *minseglen + 1; j <= (2 * *minseglen); j++){
       costfunction(sumstat, &size, &np1, &p, minorder, optimalorder[j], maxorder, &start, &j, &segcost, tol, error, shape, MBIC);
       lastchangelike[j]=segcost;
 			if(strcmp(*cost_func,"ar.norm")==0){
@@ -196,15 +196,19 @@ else if (strcmp(*cost_func,"ar.norm")==0){
     }
 
 //setup checklist
-  nchecklist=2;
-  checklist[0]=0;
-  checklist[1]=*minseglen;
+  nchecklist = 2;
+  checklist[0] = 0;
+	if(strcmp(*cost_func,"ar.norm")==0 || strcmp(*cost_func,"regquad")==0){
+		checklist[1] = *minseglen + 1;
+	}else{
+		checklist[1] = *minseglen;
+	}
 
-  for(tstar=2 * (*minseglen); tstar < np1;tstar++){
+  for(tstar = 2 * (*minseglen) + 1; tstar < np1; tstar++){
     R_CheckUserInterrupt(); // checks if user has interrupted the R session and quits if true
 
    if ((lastchangelike[tstar]) == 0){
-  		for(i=0;i<(nchecklist);i++){
+  		for(i = 0; i < (nchecklist); i++){
 				start = checklist[i];  //last point of last segment
 				costfunction(sumstat, &size, &np1, &p, minorder, optimalorder[tstar], maxorder, &start, &tstar, &segcost, tol, error, shape, MBIC);
 				if(strcmp(*cost_func,"ar.norm")==0){
@@ -223,16 +227,16 @@ else if (strcmp(*cost_func,"ar.norm")==0){
 				tmplike[i] = lastchangelike[start] + segcost + *pen;
       }
 
-    min_which(tmplike,&nchecklist,&minval,&minid); // updates minval and minid with min and which element
-    lastchangelike[tstar]=minval;
+    min_which(tmplike, &nchecklist, &minval, &minid); // updates minval and minid with min and which element
+    lastchangelike[tstar] = minval;
 		if(strcmp(*cost_func,"ar.norm")==0){
 			bicvalues[tstar] = optimalorder[tstar] * log( np1 - optimalorder[tstar] ) + lastchangelike[tstar];
 		}
-    lastchangecpts[tstar]=checklist[minid];
-    numchangecpts[tstar]=numchangecpts[lastchangecpts[tstar]]+1;
+    lastchangecpts[tstar] = checklist[minid];
+    numchangecpts[tstar] = numchangecpts[lastchangecpts[tstar]] + 1;
 
     // Update checklist for next iteration, first element is next tau
-      nchecktmp=0;
+      nchecktmp = 0;
 			for(i = 0; i < nchecklist; i++){
 				if(tmplike[i] <= (lastchangelike[tstar] +*pen)){
 					checklist[nchecktmp] = checklist[i];
@@ -242,9 +246,12 @@ else if (strcmp(*cost_func,"ar.norm")==0){
 			nchecklist = nchecktmp;
 		}
 		//Add new cpt to checklist
-		checklist[nchecklist] = tstar - (*minseglen-1); // at least 1 obs per seg
+		if(strcmp(*cost_func,"ar.norm")==0 || strcmp(*cost_func,"regquad")==0){
+			checklist[nchecklist] = tstar - (*minseglen);
+		}else{
+			checklist[nchecklist] = tstar - (*minseglen - 1); // at least 1 obs per seg
+		}
 		nchecklist++;
-
     //  nchecklist = nchecktmp;
 
   } // end taustar

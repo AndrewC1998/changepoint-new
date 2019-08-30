@@ -51,7 +51,7 @@ void FreeNPPELT(error)
 
     int *checklist;
     checklist = (int *)calloc(*n+1,sizeof(int));
-    if (checklist==NULL)   {
+    if (checklist==NULL){
       *error = 1;
       goto err1;
     }
@@ -62,20 +62,27 @@ void FreeNPPELT(error)
 
     double *tmplike;
     tmplike = (double *)calloc(*n+1,sizeof(double));
-    if (tmplike==NULL)   {
+    if (tmplike==NULL){
       *error = 2;
       goto err2;
     }
 
-    int tstar,i,whichout,nchecktmp;
+    int tstar,i,j,whichout,nchecktmp;
 
 
     void min_which();
 
-    lastchangelike[0]= -*pen;
-    lastchangecpts[0]=0;
-    numchangecpts[0]=0;
-    int j;
+    //Initialise
+    for(j = 0; j <= *minseglen; j++){
+      if(j==0){
+        lastchangelike[j] = -*pen;
+      }else{
+        lastchangelike[j] = 0;
+      }
+      lastchangecpts[j] = 0;
+      numchangecpts[j] = 0;
+    }
+
     int isum;
     double *sumstatout;
     sumstatout = (double *)calloc(*nquantiles,sizeof(double));
@@ -85,21 +92,13 @@ void FreeNPPELT(error)
        }
         costfunction(sumstatout, j, 0, nquantiles, n, &segcost, MBIC);
         lastchangelike[j] = segcost;
-     }
-
-
-    for(j=*minseglen;j<(2*(*minseglen));j++){
-      lastchangecpts[j] = 0;
-    }
-    for(j=*minseglen;j<(2*(*minseglen));j++){
-      numchangecpts[j] =1;
+        lastchangecpts[j] = 0;
+        numchangecpts[j] = 1;
     }
 
-    nchecklist=2;
-    checklist[0]=0;
-    checklist[1]=*minseglen;
-
-
+    nchecklist = 2;
+    checklist[0] = 0;
+    checklist[1] = *minseglen;
 
     for(tstar=2*(*minseglen);tstar<(*n+1);tstar++){
       for(i=0;i<(nchecklist);i++){
@@ -119,12 +118,12 @@ void FreeNPPELT(error)
       for(i=0;i<nchecklist;i++){
         if(tmplike[i]<= (lastchangelike[tstar]+*pen)){
           *(checklist+nchecktmp)=checklist[i];
-          nchecktmp+=1;
+          nchecktmp++;
         }
       }
       nchecklist = nchecktmp;
-      *(checklist+nchecklist)=tstar-(*minseglen-1); // atleast 1 obs per seg
-      nchecklist+=1;
+      *(checklist+nchecklist)=tstar-(*minseglen-1); // at least 1 obs per seg
+      nchecklist++;
     } // end taustar
 
     // put final set of changepoints together
@@ -133,7 +132,7 @@ void FreeNPPELT(error)
     while(last!=0){
       *(cptsout + ncpts) = last;
       last=lastchangecpts[last];
-      ncpts+=1;
+      ncpts++;
     }
     err2:  free(checklist);
     err1:  return;

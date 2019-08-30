@@ -5,7 +5,7 @@ NPPELT = function(sumstat,pen=0, cost_func = "nonparametric.ed", minseglen = 1, 
 
   storage.mode(sumstat) = 'double'
   error=0
-  
+
   if(cost_func=="nonparametric.ed"){
       MBIC = 0
   }else{
