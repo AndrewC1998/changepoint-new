@@ -7,7 +7,7 @@ Detects changes in local stationary wavelet autocorelation.
 Plots the optimal positioning of changepoints for data using the user specified method. 
 }
 \usage{
-nple(data, penalty = "Manual", pen.value = 6 * log(length(data) - crop), 
+nple(data, penalty = "Manual", pen.value = 6 * log(length(data) - 16), 
          method = "PELT", class = TRUE, minseglen = 30, nquantiles = 10, 
         crop = 16, family = "DaubExPhase", filter.number = 10, binwidth = 1)
 }
