@@ -1,4 +1,4 @@
-cpt.ar <- function(data, penalty = "MBIC", pen.value = 0, min.order = 1, max.order=5, method = "PELT", dist = "Normal", class = TRUE, param.estimates = TRUE, minseglen = 1, shape = 0, tol = 1e-07){
+cpt.ar <- function(data, penalty = "MBIC", pen.value = 0, min.order = 1, max.order = 5, method = "PELT", dist = "Normal", class = TRUE, param.estimates = TRUE, minseglen = 1, shape = 0, tol = 1e-07){
 
   ##Check arguments are valid
   if(any(!complete.cases(data))){stop("data has missing values, this function cannot handle missing values")}
@@ -46,7 +46,8 @@ cpt.ar <- function(data, penalty = "MBIC", pen.value = 0, min.order = 1, max.ord
   n = length(sumstat[,1])
   MBIC = 0
   if(penalty=="MBIC"){MBIC=1}
-  #pen.value = vector(("double", n+1)
+
+  pen.value <- penalty_decision(penalty=penalty, pen.value=pen.value, n=nrow(sumstat), diffparam=ncol(sumstat), asymcheck="reg.norm", method=method)
 
   optimal.order = array(min.order, dim = n+1)
   storage.mode(optimal.order) = 'integer'
@@ -68,12 +69,18 @@ cpt.ar <- function(data, penalty = "MBIC", pen.value = 0, min.order = 1, max.ord
     orders(ans) <- answer$optimalorder
     cpttype(ans) <- "regression"
     method(ans) <- method
+    BICvalues(ans) <- answer$bicvalues
+    minseglen(ans) <- minseglen
     test.stat(ans) <- dist
     pen.type(ans) <- penalty
     pen.value(ans) <- answer$pen
-    #cpts(ans) <- list(order = answer$optimalorder, lastchangecpts=answer$lastchangecpts, cpts=sort(answer$cptsout[answer$cptsout>0]), lastchangelike=answer$lastchangelike, bics = answer$bicvalues, ncpts=answer$numchangecpts)
-    if(method=="PELT") ncpts.max(ans) <- Inf
-    #if(param.estimates) ans = param(ans)
+    cpts(ans) <- sort(answer$cptsout[answer$cptsout>0])
+    if(method=="PELT"){
+      ncpts.max(ans) <- Inf
+    }
+    if(param.estimates == TRUE){
+      ans = param(ans)
+    }
     return(ans)
   }else{
     return(list(order = answer$optimalorder, lastchangecpts=answer$lastchangecpts, cpts=sort(answer$cptsout[answer$cptsout>0]), lastchangelike=answer$lastchangelike, bics = answer$bicvalues, ncpts=answer$numchangecpts))

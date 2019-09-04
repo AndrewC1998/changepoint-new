@@ -205,9 +205,9 @@ else if (strcmp(*cost_func,"ar.norm")==0){
 	}
 
   for(tstar = 2 * (*minseglen) + 1; tstar < np1; tstar++){
-    R_CheckUserInterrupt(); // checks if user has interrupted the R session and quits if true
+  	R_CheckUserInterrupt(); // checks if user has interrupted the R session and quits if true
 
-   if ((lastchangelike[tstar]) == 0){
+    if((lastchangelike[tstar]) == 0){
   		for(i = 0; i < (nchecklist); i++){
 				start = checklist[i];  //last point of last segment
 				costfunction(sumstat, &size, &np1, &p, minorder, optimalorder[tstar], maxorder, &start, &tstar, &segcost, tol, error, shape, MBIC);
@@ -264,13 +264,6 @@ else if (strcmp(*cost_func,"ar.norm")==0){
         last = lastchangecpts[last];
         ncpts++;
     }
-
-	if(*optimalorder != *minorder){
-		*n = *n - *optimalorder;
-		*m = *m + *optimalorder - 1;
-		*minseglen = *minseglen + *optimalorder;
-   	*pen = (*m + 2) * log( *n );
-	}
 
 	err5:  free(Sumstats);
 	err4:  free(tmpt);

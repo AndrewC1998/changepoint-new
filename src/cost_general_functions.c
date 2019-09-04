@@ -106,7 +106,7 @@ void mll_ar(double *SS, int *size, int *n, int *p, int *minorder, int optimalord
   //-- memory allocation --
   //Summary statistics for segment
 
-  void RegQuadCost_SS();
+  /*void RegQuadCost_SS();
   void mll_reg();
   int tmpn = *n;
   int tmpp = *p;
@@ -121,21 +121,21 @@ void mll_ar(double *SS, int *size, int *n, int *p, int *minorder, int optimalord
     sumstat[a] = SS[a];
   }
 
-  int k;
   double tmpBIC;
-  double BIC = INFINITY;
+  double BIC = INFINITY; */
+  int k;
 
-  /*for(k = *minorder; k <= *maxorder; k++){
+  for(k = *minorder; k <= *maxorder; k++){
 
-    double *Sumstats;
+    /*double *Sumstats;
 	  Sumstats = (double *)calloc(tmpn * tmpsize, sizeof(double));
 
     int nvalue, mvalue;
     nvalue = tmpn - 1;
     mvalue = tmpp + 1;
 
-    RegQuadCost_SS(sumstat, &nvalue, &mvalue, Sumstats, &tmpsize);
-    mll_reg(Sumstats, &tmpsize, &tmpn, &tmpp, minorder, k, maxorder, &start, &end, &cost, tol, error, shape, MBIC);
+    //RegQuadCost_SS(sumstat, &nvalue, &mvalue, Sumstats, &tmpsize);
+    //mll_reg(Sumstats, &tmpsize, &tmpn, &tmpp, minorder, k, maxorder, &start, &end, &cost, tol, error, shape, MBIC);
     //line above causes the error but all the printed value of each loop are correct and everything is freed correctly
     //I think this is a knock on error from the loop being updated
     free(Sumstats);
@@ -176,8 +176,8 @@ void mll_ar(double *SS, int *size, int *n, int *p, int *minorder, int optimalord
       optimalorder = optimalorder - 1;
       *cost = tmpcost;
       break;
-    }
-	} */
+    } */
+	}
 }
 
 //Evaluate the regression quadratic cost function based on summary statistics

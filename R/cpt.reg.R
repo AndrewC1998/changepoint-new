@@ -121,7 +121,7 @@ ChangepointRegression <- function(data, penalty="MBIC", penalty.value=0,
   if(method=="AMOC" && dist=="Normal"){
     out <- CptReg_AMOC_Normal(data, penalty, penalty.value, minseglen, shape, MBIC, tol)
   }else if(method=="PELT" && dist=="Normal"){
-    out <- CptReg_PELT_Normal(data, penalty.value, minseglen, shape,MBIC, tol)
+    out <- CptReg_PELT_Normal(data, penalty.value, minseglen, shape, MBIC, tol)
   }else{
     stop("Changepoint in regression method not recognised.")
   }
