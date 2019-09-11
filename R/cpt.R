@@ -157,6 +157,7 @@ cpt.meanvar=function(data,penalty="MBIC",pen.value=0,method="AMOC",Q=5,test.stat
 cpt.np=function(data, penalty="MBIC", pen.value=0, method="PELT", test.stat="empirical_distribution", class=TRUE, minseglen=1, nquantiles = 10, Q = 5){
     # checkData(data)
     if(minseglen<1){minseglen=1;warning('Minimum segment length cannot be less than 1, automatically changed to be 1.')}
+    if(nquantiles>length(data)){nquantiles=length(data);warning('Maximum nquantiles value cannot be more than length(data), automatically changed to be length(data).')}
 
     if(test.stat=="CUSUM"){
         return(cpt.mean(data=data, penalty=penalty, pen.value=pen.value, method=method, test.stat='CUSUM', class=class, minseglen=minseglen, Q=Q))
