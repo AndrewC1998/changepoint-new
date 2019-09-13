@@ -16,7 +16,7 @@ nple(data, penalty = "Manual", pen.value = 6 * log(length(data) - 16),
 	The data that the user wants to plot. 
   }
   \item{penalty}{
-  Choice of "None", "SIC", "BIC", "MBIC", AIC", "Hannan-Quinn", "Manual" and "CROPS" penalties.  If Manual is specified, the manual penalty is contained in the pen.value parameter. If CROPS is specified, the penalty range is contained in the pen.value parameter; note this is a vector of length 2 which contains the minimum and maximum penalty value.  Note CROPS can only be used if the method is "PELT". The predefined penalties listed DO count the changepoint as a parameter, postfix a 0 e.g."SIC0" to NOT count the changepoint as a parameter.
+  Choice of "None", "SIC", "BIC", "MBIC", "AIC", "Hannan-Quinn", "Manual" and "CROPS" penalties.  If Manual is specified, the manual penalty is contained in the pen.value parameter. If CROPS is specified, the penalty range is contained in the pen.value parameter; note this is a vector of length 2 which contains the minimum and maximum penalty value.  Note CROPS can only be used if the method is "PELT". The predefined penalties listed DO count the changepoint as a parameter, postfix a 0 e.g."SIC0" to NOT count the changepoint as a parameter.
   }
   \item{pen.value}{
   The value of the penalty when using the Manual penalty option.  A vector of length 2 (min,max) if using the CROPS penalty.
